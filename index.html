@@ -31,7 +31,7 @@
 <body><main id="app">
 <section class="hero" id="hero"><div class="logo">パズゴル<span class="sub">GOLF × PUZZLE</span></div><div class="stage"><b>STAGE 1</b><br>越谷ベビードラゴン<span class="turn"><em>あと</em> <span id="turn">2</span></span></div><div class="menu">☰ Menu</div>
 <div class="dragon" id="dragon"><div class="wing w1"></div><div class="wing w2"></div><div class="body"><div class="belly"></div></div><div class="head"><div class="horn h1"></div><div class="horn h2"></div><div class="eye e1"></div><div class="eye e2"></div><div class="pac"></div></div></div></section>
-<section class="hpwrap"><div class="bar"><div class="fill enemy" id="eh"></div><span class="num" id="en">5,000 / 5,000</span></div><div class="bar"><span class="heart">💗</span><div class="fill player" id="ph"></div><span class="num" id="pn">3,200 / 3,200</span></div></section>
+<section class="hpwrap"><div class="bar"><div class="fill enemy" id="eh"></div><span class="num" id="en">5,000 / 5,000</span></div><div style="display:flex;align-items:center;gap:7px;margin:1px 1px 3px;font-size:12px;font-weight:1000"><span style="background:#fff;color:#173126;border-radius:12px;padding:2px 8px">あなたのHP</span><span style="opacity:.85">ピンクで回復</span></div><div class="bar"><span class="heart">💗</span><div class="fill player" id="ph"></div><span class="num" id="pn">3,200 / 3,200</span></div></section>
 <div id="status">ゴルフボールを押したまま動かそう！</div><div class="board" id="board"></div><div class="foot">パズゴル<small>GOLF GUTS</small></div><div class="fx" id="fx"></div>
 <div class="over" id="over"><div><h1 id="result"></h1><p id="message"></p><button onclick="location.reload()">もう一度</button></div></div>
 </main>
@@ -42,9 +42,25 @@ const wait=n=>new Promise(r=>setTimeout(r,n)), rnd=()=>COLORS[Math.floor(Math.ra
 function matches(){let s=new Set;for(let r=0;r<5;r++){let q=0;for(let c=1;c<=6;c++){if(c<6&&grid[r*6+c]===grid[r*6+q])continue;if(c-q>=3)for(let k=q;k<c;k++)s.add(r*6+k);q=c}}for(let c=0;c<6;c++){let q=0;for(let r=1;r<=5;r++){if(r<5&&grid[r*6+c]===grid[q*6+c])continue;if(r-q>=3)for(let k=q;k<r;k++)s.add(k*6+c);q=r}}return s}
 function init(){do{grid=Array.from({length:30},rnd)}while(matches().size);draw()} function draw(){board.innerHTML='';grid.forEach((c,i)=>{let d=document.createElement('div');d.className='ball '+c;d.dataset.i=i;board.appendChild(d)})} init();
 function at(x,y){for(let i=0;i<board.children.length;i++){let r=board.children[i].getBoundingClientRect();if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom)return i}return-1}
-board.onpointerdown=e=>{if(busy)return;let i=at(e.clientX,e.clientY);if(i<0)return;drag=true;current=i;board.setPointerCapture(e.pointerId);board.children[i].classList.add('sel')}
-board.onpointermove=e=>{if(!drag)return;let n=at(e.clientX,e.clientY);if(n<0||n===current)return;let r=Math.floor(current/6),c=current%6,R=Math.floor(n/6),C=n%6;if(Math.abs(r-R)+Math.abs(c-C)!==1)return;[grid[current],grid[n]]=[grid[n],grid[current]];let a=board.children[current],b=board.children[n];a.className='ball '+grid[current];b.className='ball '+grid[n]+' sel';current=n;if(navigator.vibrate)navigator.vibrate(8)}
-board.onpointerup=()=>{if(drag){drag=false;resolve()}}
+let activePointer=null;
+board.onpointerdown=e=>{if(busy)return;let i=at(e.clientX,e.clientY);if(i<0)return;drag=true;current=i;activePointer=e.pointerId;board.setPointerCapture(e.pointerId);board.children[i].classList.add('sel');e.preventDefault()}
+window.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==activePointer)return;
+  const br=board.getBoundingClientRect();
+  const pad=95;
+  if(e.clientX<br.left-pad||e.clientX>br.right+pad||e.clientY<br.top-pad||e.clientY>br.bottom+pad)return;
+  let x=Math.max(br.left+2,Math.min(br.right-2,e.clientX)),y=Math.max(br.top+2,Math.min(br.bottom-2,e.clientY));
+  let n=at(x,y);if(n<0||n===current)return;
+  let r=Math.floor(current/6),c=current%6,R=Math.floor(n/6),C=n%6;
+  while(Math.abs(r-R)+Math.abs(c-C)>0){
+    let nr=r,nc=c;if(Math.abs(C-c)>=Math.abs(R-r))nc+=Math.sign(C-c);else nr+=Math.sign(R-r);
+    let next=nr*6+nc;[grid[current],grid[next]]=[grid[next],grid[current]];
+    let oldEl=board.children[current],newEl=board.children[next];oldEl.className='ball '+grid[current];newEl.className='ball '+grid[next]+' sel';
+    current=next;r=nr;c=nc;
+  }
+  if(navigator.vibrate)navigator.vibrate(6);e.preventDefault();
+},{passive:false});
+function release(e){if(!drag||(e.pointerId!==undefined&&activePointer!==null&&e.pointerId!==activePointer))return;drag=false;activePointer=null;try{board.releasePointerCapture(e.pointerId)}catch(_){}resolve()}
+window.addEventListener('pointerup',release);window.addEventListener('pointercancel',release);
 function groups(m){let seen=new Set,gs=[];for(let x of m){if(seen.has(x))continue;let st=[x],g=[];seen.add(x);while(st.length){let z=st.pop();g.push(z);let r=Math.floor(z/6),c=z%6;for(let [dr,dc] of [[1,0],[-1,0],[0,1],[0,-1]]){let R=r+dr,C=c+dc,n=R*6+C;if(R>=0&&R<5&&C>=0&&C<6&&m.has(n)&&!seen.has(n)&&grid[n]===grid[z]){seen.add(n);st.push(n)}}}gs.push(g)}return gs}
 function hitWord(n){return n<=2?'ペチッ！':n<=4?'バシッ！':n<=6?'ドン！！':n<=9?'ドドドドッ！！！':'ULTRA SHOT!!!'}
 function flash(text){fx.textContent=text;fx.classList.remove('show');void fx.offsetWidth;fx.classList.add('show')}
