@@ -62,14 +62,14 @@ button{font:inherit;cursor:pointer;color:inherit;touch-action:manipulation}butto
 .sheet h1{font-size:35px;margin:0 0 10px;color:#fff1b3}.sheet h2{font-size:23px;margin:0 0 17px}.sheet p{font-size:13px;line-height:1.8;color:#d5e8dc}.sheet small{color:#b0c8ba;font-size:11px;line-height:1.7;display:block}.sheet button{display:block;width:100%;padding:13px;border:0;border-radius:11px;font-size:14px;font-weight:900;margin-top:12px;background:#e9d291;color:#22392c}.sheet .secondary{background:#234d40;border:1px solid #729c83;color:#e3f2e7}.stats{display:flex;justify-content:space-between;margin:16px 0;font-size:12px;color:#c9dfd0}.sprite-defs{position:absolute;width:0;height:0;overflow:hidden}
 @media(prefers-reduced-motion:reduce){.orb,.bar i{transition:none!important}}
 @media(max-height:610px){.topbar{top:9px}.logo{font-size:24px}.stage-title{top:65px;font-size:10px;left:13px}.stage-title small{font-size:8px}.menu{padding:7px 11px}.playerhud{margin-top:10px;padding:8px 10px}.foot{height:26px;flex-basis:26px}.enemyhud{left:13px;right:13px;bottom:8px}.hero::after{display:none}}
-
-/* v0.6 爽快感 */
-.dragon.fx-soft .eye:after{transform:translateY(3px) scaleY(.7)}
-.dragon.fx-mid .eye{height:31px;top:49px}.dragon.fx-mid .eye:after{height:7px;top:8px;background:#17232c;box-shadow:none}
-.dragon.fx-hard .eye{height:10px;top:59px;background:#321b20;border-radius:50%}.dragon.fx-hard .eye:after{display:none}
-.heal-orb{position:absolute;width:18px;height:18px;border-radius:50%;background:#ff8fbd;box-shadow:0 0 12px 5px #ff7ab7aa;z-index:20;pointer-events:none}.heal-orb:after{content:"♥";position:absolute;inset:-5px;display:grid;place-items:center;color:#fff;font-size:16px}
-.dragon.ko{transform-origin:50% 90%;animation:ko-v06 1s cubic-bezier(.2,.75,.2,1) forwards}
-@keyframes ko-v06{0%{transform:rotate(0) scale(1)}30%{transform:rotate(-9deg) scale(1.07)}70%{transform:translateY(18px) rotate(70deg) scale(.96)}100%{transform:translateY(36px) rotate(88deg) scale(.9);filter:grayscale(.2) drop-shadow(0 3px 3px #0005)}}
+/* 爽快感 v0.6 */
+.dragon.hurt1{filter:brightness(1.08) drop-shadow(0 8px 5px #0004)}
+.dragon.hurt2 .eye,.dragon.hurt3 .eye{transform:scaleY(.38);transform-origin:center}
+.dragon.hurt3{filter:brightness(1.18) drop-shadow(0 8px 8px #ffdf75)}
+.dragon.ko{animation:koFall 1s cubic-bezier(.2,.75,.2,1) forwards!important;transform-origin:50% 88%}
+@keyframes koFall{0%{transform:rotate(0) scale(1)}28%{transform:rotate(-9deg) scale(1.07)}100%{transform:translateY(35px) rotate(82deg) scale(.9);opacity:.72}}
+.healParticle{position:absolute;width:19px;height:19px;border-radius:50%;z-index:90;background:#ff8fbd;box-shadow:0 0 12px 5px #ff72b7aa;pointer-events:none}
+.healParticle:after{content:"♥";position:absolute;inset:-4px;display:grid;place-items:center;color:#fff;font-size:16px}
 </style>
 </head>
 <body>
@@ -105,7 +105,7 @@ button{font:inherit;cursor:pointer;color:inherit;touch-action:manipulation}butto
  */
 (() => {
   'use strict';
-  const VERSION = '0.6';
+  const VERSION = '0.5';
   const COLS = 6, ROWS = 5, SIZE = COLS * ROWS;
   const COLORS = ['red', 'blue', 'green', 'yellow', 'purple', 'pink'];
   const LABELS = ['赤・炎', '青・水滴', '緑・葉', '黄・雷', '紫・渦', 'ピンク・回復'];
@@ -266,7 +266,7 @@ button{font:inherit;cursor:pointer;color:inherit;touch-action:manipulation}butto
   function resetGame(types){
     state.epoch++;
     if(state.drag)cancelDrag('');
-    if(wordAnimation)wordAnimation.cancel();if(dragonAnimation)dragonAnimation.cancel();ui.dragon.classList.remove('ko','fx-soft','fx-mid','fx-hard');
+    if(wordAnimation)wordAnimation.cancel();if(dragonAnimation)dragonAnimation.cancel();
     ui.effects.replaceChildren();ui.word.style.opacity='0';ui.result.hidden=true;ui.help.hidden=true;modalMode(false);
     ui.shell.classList.remove('resolving');ui.pieces.replaceChildren();state.tiles.clear();
     state.turn=0;state.enemy=CONFIG.enemyMax;state.player=CONFIG.playerMax;state.maxCombo=0;state.lastResult=null;state.refillQueue=[];
@@ -431,39 +431,38 @@ button{font:inherit;cursor:pointer;color:inherit;touch-action:manipulation}butto
     if(a)a.finished.then(()=>el.remove()).catch(()=>el.remove());else el.remove();
   }
   function dragonFace(combo){
-    ui.dragon.classList.remove('fx-soft','fx-mid','fx-hard');
-    ui.dragon.classList.add(combo<=2?'fx-soft':combo<=4?'fx-mid':'fx-hard');
-    setTimeout(()=>ui.dragon.classList.remove('fx-soft','fx-mid','fx-hard'),motion(650));
+    ui.dragon.classList.remove('hurt1','hurt2','hurt3');
+    const c=combo<=2?'hurt1':combo<=4?'hurt2':'hurt3';ui.dragon.classList.add(c);
+    setTimeout(()=>ui.dragon.classList.remove(c),motion(650));
   }
-  async function healSuck(amount,count,epoch){
-    if(!count)return;
-    const dest=centerOf(ui.playerHud),g=state.geometry,n=Math.min(8,Math.max(3,Math.ceil(count/2)));
-    for(let i=0;i<n;i++){
-      const el=document.createElement('div');el.className='heal-orb';ui.effects.appendChild(el);
-      const start=appPoint(g.left+g.width*(.18+Math.random()*.64),g.top+g.height*(.2+Math.random()*.6));
-      const a=animateElement(el,[{transform:`translate(${start.x-9}px,${start.y-9}px) scale(1)`,opacity:1},{transform:`translate(${dest.x-9}px,${dest.y-9}px) scale(.25)`,opacity:.15}],{duration:motion(470),easing:'cubic-bezier(.2,.75,.2,1)',fill:'both'});
-      if(a)a.finished.then(()=>el.remove()).catch(()=>el.remove());else el.remove();
-      await wait(motion(42),epoch);
-    }
-    await wait(motion(190),epoch);
-    floating(amount?`＋${amount} HP`:'HP満タン',dest,'float-text heal',850);
+  async function healSuction(amount,count,epoch){
+    if(!count)return;const start=centerOf(ui.board),target=centerOf(ui.playerHud);
+    const n=Math.min(8,Math.max(3,Math.ceil(count/2)));
+    for(let i=0;i<n;i++){const el=document.createElement('div');el.className='healParticle';ui.effects.appendChild(el);
+      const sx=start.x+(Math.random()-.5)*state.geometry.width*.55,sy=start.y+(Math.random()-.5)*state.geometry.height*.45;
+      const a=animateElement(el,[{transform:`translate(${sx-9}px,${sy-9}px) scale(1)`,opacity:1},{transform:`translate(${target.x-9}px,${target.y-9}px) scale(.2)`,opacity:.1}],{duration:motion(460),easing:'cubic-bezier(.2,.75,.2,1)',fill:'both'});
+      if(a)a.finished.then(()=>el.remove()).catch(()=>el.remove());else el.remove();await wait(motion(38),epoch);}
+    await wait(motion(150),epoch);floating(amount?`＋${amount} HP`:'HP満タン',target,'float-text heal',900);
   }
   async function shoot(combo,attackColors,epoch){
-    const count=Math.min(32,Math.max(1,combo*3-2)),g=state.geometry;
-    const destination=centerOf(ui.anchor);destination.y+=ui.anchor.getBoundingClientRect().height*.08;
+    const count=Math.min(28,Math.max(1,combo*3-2)),g=state.geometry;
+    const destination=centerOf(ui.anchor);
+    destination.y+=ui.anchor.getBoundingClientRect().height*.08;
     for(let i=0;i<count;i++){
       const color=attackColors[i%attackColors.length],el=document.createElement('div');el.className='flyball';
       el.innerHTML=`<svg viewBox="0 0 100 100"><use href="#orb-${COLORS[color]}"></use></svg>`;ui.effects.appendChild(el);
-      const start=appPoint(g.left+g.width*(.15+(i%8)*.1),g.top+g.step*.38);
-      const target={x:destination.x+((i%3)-1)*10,y:destination.y+((i%4)-1.5)*8};
-      const a=animateElement(el,[{transform:`translate(${start.x-12}px,${start.y-12}px) scale(1)`,opacity:1},{transform:`translate(${target.x-12}px,${target.y-12}px) scale(.55)`,opacity:1}],{duration:motion(combo>=5?210:250),easing:'cubic-bezier(.5,0,.8,.55)',fill:'both'});
-      const done=()=>{el.remove();if(epoch===state.epoch&&!reducedMotion.matches)impact(target,combo);};
+      const start=appPoint(g.left+g.width*(.18+(i%7)*.1),g.top+g.step*.38);
+      const target={x:destination.x+((i%3)-1)*9,y:destination.y+((i%4)-1.5)*7};
+      const a=animateElement(el,[{transform:`translate(${start.x-12}px,${start.y-12}px) scale(1)`,opacity:1},{transform:`translate(${target.x-12}px,${target.y-12}px) scale(.6)`,opacity:1}],{duration:motion(250),easing:'cubic-bezier(.5,0,.8,.55)',fill:'both'});
+      const done=()=>{el.remove();if(epoch===state.epoch&&!reducedMotion.matches&&i%2===0)impact(target,combo);};
       if(a)a.finished.then(done).catch(()=>el.remove());else done();
-      await wait(motion(combo>=5?16:21),epoch);
+      await wait(motion(21),epoch);
     }
-    await wait(motion(210),epoch);battleWord(hitWord(combo),combo);dragonFace(combo);
-    if(dragonAnimation)dragonAnimation.cancel();const strength=Math.min(14,1+combo*1.45);
-    dragonAnimation=animateElement(ui.dragon,[{transform:'translateX(0) rotate(0)'},{transform:`translateX(${strength}px) rotate(${strength*.7}deg)`,offset:.22},{transform:`translateX(${-strength*.6}px) rotate(${-strength*.45}deg)`,offset:.55},{transform:'translateX(0) rotate(0)'}],{duration:motion(combo>=5?430:330),easing:'ease-out'});
+    await wait(motion(240),epoch);
+    battleWord(hitWord(combo),combo);dragonFace(combo);
+    if(dragonAnimation)dragonAnimation.cancel();
+    const strength=Math.min(9,1+combo*1.05);
+    dragonAnimation=animateElement(ui.dragon,[{transform:'translateX(0) rotate(0)'},{transform:`translateX(${strength}px) rotate(${strength*.6}deg)`,offset:.25},{transform:`translateX(${-strength*.5}px) rotate(${-strength*.35}deg)`,offset:.6},{transform:'translateX(0) rotate(0)'}],{duration:motion(320),easing:'ease-out'});
   }
   async function collapse(epoch){
     const next=Array(SIZE).fill(null);
@@ -502,8 +501,7 @@ button{font:inherit;cursor:pointer;color:inherit;touch-action:manipulation}butto
     const damage=Math.round(attackBalls*CONFIG.attackPerBall*(1+(combo-1)*CONFIG.comboStep));
     const nominalHeal=Math.round(healBalls*CONFIG.healPerBall*(1+(combo-1)*CONFIG.healComboStep));
     const actualHeal=Math.min(CONFIG.playerMax-state.player,nominalHeal);
-    state.player+=actualHeal;updateHP();
-    if(healBalls){await healSuck(actualHeal,healBalls,epoch);}
+    if(healBalls){await healSuction(actualHeal,healBalls,epoch);state.player+=actualHeal;updateHP();}
     setPhase('attack');
     if(attackBalls){
       await shoot(combo,attackColors,epoch);state.enemy=Math.max(0,state.enemy-damage);updateHP();
@@ -512,7 +510,7 @@ button{font:inherit;cursor:pointer;color:inherit;touch-action:manipulation}butto
     }else{battleWord('回復！',combo);await wait(motion(420),epoch);}
     state.turn++;state.lastResult={combo,damage,heal:actualHeal,healBalls,attackBalls,waves};
     updateHP();
-    if(state.enemy<=0){battleWord('FINISH!!',10);ui.dragon.classList.add('fx-hard');await wait(motion(330),epoch);ui.dragon.classList.add('ko');await wait(motion(1050),epoch);finish(true);return;}
+    if(state.enemy<=0){battleWord('FINISH!!',Math.max(combo,7));ui.dragon.classList.remove('hurt1','hurt2','hurt3');ui.dragon.classList.add('hurt3');await wait(motion(320),epoch);ui.dragon.classList.add('ko');await wait(motion(1000),epoch);finish(true);return;}
     if(state.turn%CONFIG.enemyEvery===0){
       setPhase('enemy');ui.count.textContent='攻撃！';setStatus('越谷ベビードラゴンの反撃');battleWord('バブー！');
       await wait(motion(410),epoch);state.player=Math.max(0,state.player-CONFIG.enemyAttack);updateHP();
