@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#071f19">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>パズゴル｜操作改善 v0.5</title>
+<title>パズゴル｜爽快感 v0.6</title>
 <style>
 :root{color-scheme:dark;--ink:#f4faf5;--mint:#81e9bc;--screen-h:100dvh;--screen-w:100vw;--app-w:420px;--dragon-scale:.85}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -62,6 +62,14 @@ button{font:inherit;cursor:pointer;color:inherit;touch-action:manipulation}butto
 .sheet h1{font-size:35px;margin:0 0 10px;color:#fff1b3}.sheet h2{font-size:23px;margin:0 0 17px}.sheet p{font-size:13px;line-height:1.8;color:#d5e8dc}.sheet small{color:#b0c8ba;font-size:11px;line-height:1.7;display:block}.sheet button{display:block;width:100%;padding:13px;border:0;border-radius:11px;font-size:14px;font-weight:900;margin-top:12px;background:#e9d291;color:#22392c}.sheet .secondary{background:#234d40;border:1px solid #729c83;color:#e3f2e7}.stats{display:flex;justify-content:space-between;margin:16px 0;font-size:12px;color:#c9dfd0}.sprite-defs{position:absolute;width:0;height:0;overflow:hidden}
 @media(prefers-reduced-motion:reduce){.orb,.bar i{transition:none!important}}
 @media(max-height:610px){.topbar{top:9px}.logo{font-size:24px}.stage-title{top:65px;font-size:10px;left:13px}.stage-title small{font-size:8px}.menu{padding:7px 11px}.playerhud{margin-top:10px;padding:8px 10px}.foot{height:26px;flex-basis:26px}.enemyhud{left:13px;right:13px;bottom:8px}.hero::after{display:none}}
+
+/* v0.6 爽快感 */
+.dragon.fx-soft .eye:after{transform:translateY(3px) scaleY(.7)}
+.dragon.fx-mid .eye{height:31px;top:49px}.dragon.fx-mid .eye:after{height:7px;top:8px;background:#17232c;box-shadow:none}
+.dragon.fx-hard .eye{height:10px;top:59px;background:#321b20;border-radius:50%}.dragon.fx-hard .eye:after{display:none}
+.heal-orb{position:absolute;width:18px;height:18px;border-radius:50%;background:#ff8fbd;box-shadow:0 0 12px 5px #ff7ab7aa;z-index:20;pointer-events:none}.heal-orb:after{content:"♥";position:absolute;inset:-5px;display:grid;place-items:center;color:#fff;font-size:16px}
+.dragon.ko{transform-origin:50% 90%;animation:ko-v06 1s cubic-bezier(.2,.75,.2,1) forwards}
+@keyframes ko-v06{0%{transform:rotate(0) scale(1)}30%{transform:rotate(-9deg) scale(1.07)}70%{transform:translateY(18px) rotate(70deg) scale(.96)}100%{transform:translateY(36px) rotate(88deg) scale(.9);filter:grayscale(.2) drop-shadow(0 3px 3px #0005)}}
 </style>
 </head>
 <body>
@@ -83,7 +91,7 @@ button{font:inherit;cursor:pointer;color:inherit;touch-action:manipulation}butto
 </section>
 <div id="status" aria-live="polite">ボールを押したまま動かそう</div>
 <div class="board-shell" id="boardShell"><div id="board" tabindex="0" role="application" aria-label="6列5行のパズル。指でボールを持って動かし、同じ色を縦横3個以上に揃えます。キーボードでは矢印キーで選択、スペースで持ち、もう一度スペースで離します。"><div class="cells" id="cells" aria-hidden="true"></div><div id="slot" aria-hidden="true"></div><div class="pieces" id="pieces" aria-hidden="true"></div></div></div>
-<footer class="foot"><strong>GOLF GUTS</strong><span class="build">操作改善 v0.5</span></footer>
+<footer class="foot"><strong>GOLF GUTS</strong><span class="build">爽快感 v0.6</span></footer>
 <div id="effects" aria-hidden="true"></div><div id="battle-word" aria-hidden="true"></div>
 <div class="dialog-layer" id="helpLayer" hidden><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><h2 id="helpTitle">あそび方</h2><p>ボールを1つ押したまま、なぞって入れ替えます。指を離すと、同じ色が縦・横に3個以上並んだ場所が消えます。</p><p>ピンクは回復、ほかの5色は攻撃。コンボが増えるほどダメージと演出が大きくなります。</p><p>盤面の外へ指がはみ出しても、ページ内なら操作を維持します。戻ってそのまま続けられます。</p><small>操作確認版：操作時間の制限なし。敵は2ターンに1回攻撃します。揃わなかった手は従来どおりターンを消費しません。端末操作などで入力が中断された場合、その手を元に戻します。モンスターは仮表示です。</small><button id="helpClose">ゲームに戻る</button><button class="secondary" id="resetButton">最初からやり直す</button></section></div>
 <div class="dialog-layer" id="resultLayer" hidden><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="resultTitle"><h1 id="resultTitle">CLEAR!</h1><p id="resultMessage"></p><div class="stats"><span id="resultTurns"></span><span id="resultCombo"></span></div><button id="retryButton">もう一度あそぶ</button></section></div>
@@ -97,7 +105,7 @@ button{font:inherit;cursor:pointer;color:inherit;touch-action:manipulation}butto
  */
 (() => {
   'use strict';
-  const VERSION = '0.5';
+  const VERSION = '0.6';
   const COLS = 6, ROWS = 5, SIZE = COLS * ROWS;
   const COLORS = ['red', 'blue', 'green', 'yellow', 'purple', 'pink'];
   const LABELS = ['赤・炎', '青・水滴', '緑・葉', '黄・雷', '紫・渦', 'ピンク・回復'];
@@ -258,7 +266,7 @@ button{font:inherit;cursor:pointer;color:inherit;touch-action:manipulation}butto
   function resetGame(types){
     state.epoch++;
     if(state.drag)cancelDrag('');
-    if(wordAnimation)wordAnimation.cancel();if(dragonAnimation)dragonAnimation.cancel();
+    if(wordAnimation)wordAnimation.cancel();if(dragonAnimation)dragonAnimation.cancel();ui.dragon.classList.remove('ko','fx-soft','fx-mid','fx-hard');
     ui.effects.replaceChildren();ui.word.style.opacity='0';ui.result.hidden=true;ui.help.hidden=true;modalMode(false);
     ui.shell.classList.remove('resolving');ui.pieces.replaceChildren();state.tiles.clear();
     state.turn=0;state.enemy=CONFIG.enemyMax;state.player=CONFIG.playerMax;state.maxCombo=0;state.lastResult=null;state.refillQueue=[];
@@ -422,25 +430,40 @@ button{font:inherit;cursor:pointer;color:inherit;touch-action:manipulation}butto
     const a=animateElement(el,[{transform:'scale(.3)',opacity:.9},{transform:`scale(${Math.min(2.5,.8+combo*.14)})`,opacity:0}],{duration:motion(220),easing:'ease-out',fill:'both'});
     if(a)a.finished.then(()=>el.remove()).catch(()=>el.remove());else el.remove();
   }
+  function dragonFace(combo){
+    ui.dragon.classList.remove('fx-soft','fx-mid','fx-hard');
+    ui.dragon.classList.add(combo<=2?'fx-soft':combo<=4?'fx-mid':'fx-hard');
+    setTimeout(()=>ui.dragon.classList.remove('fx-soft','fx-mid','fx-hard'),motion(650));
+  }
+  async function healSuck(amount,count,epoch){
+    if(!count)return;
+    const dest=centerOf(ui.playerHud),g=state.geometry,n=Math.min(8,Math.max(3,Math.ceil(count/2)));
+    for(let i=0;i<n;i++){
+      const el=document.createElement('div');el.className='heal-orb';ui.effects.appendChild(el);
+      const start=appPoint(g.left+g.width*(.18+Math.random()*.64),g.top+g.height*(.2+Math.random()*.6));
+      const a=animateElement(el,[{transform:`translate(${start.x-9}px,${start.y-9}px) scale(1)`,opacity:1},{transform:`translate(${dest.x-9}px,${dest.y-9}px) scale(.25)`,opacity:.15}],{duration:motion(470),easing:'cubic-bezier(.2,.75,.2,1)',fill:'both'});
+      if(a)a.finished.then(()=>el.remove()).catch(()=>el.remove());else el.remove();
+      await wait(motion(42),epoch);
+    }
+    await wait(motion(190),epoch);
+    floating(amount?`＋${amount} HP`:'HP満タン',dest,'float-text heal',850);
+  }
   async function shoot(combo,attackColors,epoch){
-    const count=Math.min(28,Math.max(1,combo*3-2)),g=state.geometry;
-    const destination=centerOf(ui.anchor);
-    destination.y+=ui.anchor.getBoundingClientRect().height*.08;
+    const count=Math.min(32,Math.max(1,combo*3-2)),g=state.geometry;
+    const destination=centerOf(ui.anchor);destination.y+=ui.anchor.getBoundingClientRect().height*.08;
     for(let i=0;i<count;i++){
       const color=attackColors[i%attackColors.length],el=document.createElement('div');el.className='flyball';
       el.innerHTML=`<svg viewBox="0 0 100 100"><use href="#orb-${COLORS[color]}"></use></svg>`;ui.effects.appendChild(el);
-      const start=appPoint(g.left+g.width*(.18+(i%7)*.1),g.top+g.step*.38);
-      const target={x:destination.x+((i%3)-1)*9,y:destination.y+((i%4)-1.5)*7};
-      const a=animateElement(el,[{transform:`translate(${start.x-12}px,${start.y-12}px) scale(1)`,opacity:1},{transform:`translate(${target.x-12}px,${target.y-12}px) scale(.6)`,opacity:1}],{duration:motion(250),easing:'cubic-bezier(.5,0,.8,.55)',fill:'both'});
-      const done=()=>{el.remove();if(epoch===state.epoch&&!reducedMotion.matches&&i%2===0)impact(target,combo);};
+      const start=appPoint(g.left+g.width*(.15+(i%8)*.1),g.top+g.step*.38);
+      const target={x:destination.x+((i%3)-1)*10,y:destination.y+((i%4)-1.5)*8};
+      const a=animateElement(el,[{transform:`translate(${start.x-12}px,${start.y-12}px) scale(1)`,opacity:1},{transform:`translate(${target.x-12}px,${target.y-12}px) scale(.55)`,opacity:1}],{duration:motion(combo>=5?210:250),easing:'cubic-bezier(.5,0,.8,.55)',fill:'both'});
+      const done=()=>{el.remove();if(epoch===state.epoch&&!reducedMotion.matches)impact(target,combo);};
       if(a)a.finished.then(done).catch(()=>el.remove());else done();
-      await wait(motion(21),epoch);
+      await wait(motion(combo>=5?16:21),epoch);
     }
-    await wait(motion(240),epoch);
-    battleWord(hitWord(combo),combo);
-    if(dragonAnimation)dragonAnimation.cancel();
-    const strength=Math.min(9,1+combo*1.05);
-    dragonAnimation=animateElement(ui.dragon,[{transform:'translateX(0) rotate(0)'},{transform:`translateX(${strength}px) rotate(${strength*.6}deg)`,offset:.25},{transform:`translateX(${-strength*.5}px) rotate(${-strength*.35}deg)`,offset:.6},{transform:'translateX(0) rotate(0)'}],{duration:motion(320),easing:'ease-out'});
+    await wait(motion(210),epoch);battleWord(hitWord(combo),combo);dragonFace(combo);
+    if(dragonAnimation)dragonAnimation.cancel();const strength=Math.min(14,1+combo*1.45);
+    dragonAnimation=animateElement(ui.dragon,[{transform:'translateX(0) rotate(0)'},{transform:`translateX(${strength}px) rotate(${strength*.7}deg)`,offset:.22},{transform:`translateX(${-strength*.6}px) rotate(${-strength*.45}deg)`,offset:.55},{transform:'translateX(0) rotate(0)'}],{duration:motion(combo>=5?430:330),easing:'ease-out'});
   }
   async function collapse(epoch){
     const next=Array(SIZE).fill(null);
@@ -480,7 +503,7 @@ button{font:inherit;cursor:pointer;color:inherit;touch-action:manipulation}butto
     const nominalHeal=Math.round(healBalls*CONFIG.healPerBall*(1+(combo-1)*CONFIG.healComboStep));
     const actualHeal=Math.min(CONFIG.playerMax-state.player,nominalHeal);
     state.player+=actualHeal;updateHP();
-    if(healBalls){floating(actualHeal?`＋${actualHeal} 回復`:'HP満タン',centerOf(ui.playerHud),'float-text heal',850);}
+    if(healBalls){await healSuck(actualHeal,healBalls,epoch);}
     setPhase('attack');
     if(attackBalls){
       await shoot(combo,attackColors,epoch);state.enemy=Math.max(0,state.enemy-damage);updateHP();
@@ -489,7 +512,7 @@ button{font:inherit;cursor:pointer;color:inherit;touch-action:manipulation}butto
     }else{battleWord('回復！',combo);await wait(motion(420),epoch);}
     state.turn++;state.lastResult={combo,damage,heal:actualHeal,healBalls,attackBalls,waves};
     updateHP();
-    if(state.enemy<=0){finish(true);return;}
+    if(state.enemy<=0){battleWord('FINISH!!',10);ui.dragon.classList.add('fx-hard');await wait(motion(330),epoch);ui.dragon.classList.add('ko');await wait(motion(1050),epoch);finish(true);return;}
     if(state.turn%CONFIG.enemyEvery===0){
       setPhase('enemy');ui.count.textContent='攻撃！';setStatus('越谷ベビードラゴンの反撃');battleWord('バブー！');
       await wait(motion(410),epoch);state.player=Math.max(0,state.player-CONFIG.enemyAttack);updateHP();
