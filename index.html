@@ -1,74 +1,540 @@
 <!doctype html>
-<html lang="ja"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>パズゴル STAGE 1</title>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#071f19">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>パズゴル｜操作改善 v0.5</title>
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;background:#071c16;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;display:flex;justify-content:center;overflow-x:hidden}
-#app{width:min(100vw,460px);min-height:100vh;background:linear-gradient(#4da9e5 0 12%,#72b45e 34%,#08241b 34%);position:relative;overflow:hidden}
-.hero{height:36vh;min-height:270px;max-height:340px;position:relative;background:linear-gradient(#55b5ec 0 35%,#85c76b 36% 100%);overflow:hidden}
-.hero:before{content:"";position:absolute;left:-10%;right:-10%;bottom:-20px;height:115px;background:#5aa34d;border-radius:50% 50% 0 0}
-.logo{position:absolute;left:15px;top:12px;font-size:31px;font-weight:1000;letter-spacing:-2px;text-shadow:0 3px #111;z-index:5}.sub{display:block;font-size:10px;letter-spacing:1px;color:#86e7df;text-align:center;text-shadow:none}
-.stage{position:absolute;left:17px;top:82px;z-index:5;font-weight:900;text-shadow:0 2px 2px #000}.stage b{display:inline-block;background:#111;border-radius:20px;padding:4px 10px;margin-bottom:5px}.turn{display:block;margin-top:7px;background:#111;border-radius:20px;padding:6px 13px;width:max-content;font-size:20px}.turn em{color:#ff3f4c;font-style:normal}.menu{position:absolute;right:14px;top:17px;background:#102b36;border-radius:25px;padding:10px 16px;font-weight:900;z-index:5}
-.dragon{position:absolute;left:50%;bottom:9px;transform:translateX(-50%);width:185px;height:195px;z-index:3;filter:drop-shadow(0 8px 5px #0004)}
+:root{color-scheme:dark;--ink:#f4faf5;--mint:#81e9bc;--screen-h:100dvh;--screen-w:100vw;--app-w:420px;--dragon-scale:.85}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:#071f19}
+body{margin:0;position:fixed;inset:0;overflow:hidden;overscroll-behavior:none;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;-webkit-text-size-adjust:100%}
+button{font:inherit;cursor:pointer;color:inherit;touch-action:manipulation}button:disabled{opacity:.5;cursor:default}button:focus-visible{outline:3px solid #fff;outline-offset:3px}[hidden]{display:none!important}
+#viewport{position:fixed;left:0;top:0;width:var(--screen-w);height:var(--screen-h);display:flex;justify-content:center;align-items:center;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);overflow:hidden;touch-action:none;overscroll-behavior:none}
+#app{width:var(--app-w);max-width:100%;height:100%;max-height:870px;display:flex;flex-direction:column;position:relative;overflow:hidden;isolation:isolate;background:#09271f;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;box-shadow:0 0 80px #0006}
+#viewport.modal-open,#app.modal-open{touch-action:pan-y}
+.hero{flex:1 1 auto;min-height:146px;position:relative;overflow:hidden;background:linear-gradient(#64b5e1 0%,#a8d7e7 43%,#91bc70 44%,#71aa5a 100%)}
+.hero::before{content:"";position:absolute;left:-10%;right:-20%;height:95px;bottom:-28px;border-radius:50% 50% 0 0;background:#508a41;box-shadow:0 -12px 0 #78ae50}
+.hero::after{content:"";position:absolute;width:130px;height:29px;border-radius:50%;left:-45px;bottom:100px;background:#73bfd1;box-shadow:0 5px 0 #b9d7a0;opacity:.9}
+.topbar{position:absolute;z-index:5;left:15px;right:15px;top:12px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:29px;line-height:1.08;font-weight:1000;letter-spacing:-1.5px;text-shadow:2px 3px 0 #102b27}.logo small{display:block;font-size:9px;letter-spacing:1.6px;text-align:center;color:#183b3c;text-shadow:none;margin-top:5px;font-weight:900}
+.menu{border:1px solid #ffffff44;background:#102c38e8;border-radius:23px;padding:9px 13px;font-size:12px;font-weight:800;box-shadow:0 3px 8px #17312c20}
+.stage-title{position:absolute;left:16px;top:76px;z-index:5;font-size:12px;line-height:1.75;font-weight:900;text-shadow:0 1px 3px #153728}
+.stage-title small{display:block;font-size:9px;letter-spacing:1.3px;background:#14382dda;padding:1px 8px;width:max-content;border-radius:7px;margin-bottom:4px}
+.dragon-anchor{position:absolute;left:58%;bottom:58px;width:185px;height:195px;transform:translateX(-50%) scale(var(--dragon-scale));transform-origin:center bottom;z-index:2;pointer-events:none}
+.dragon{width:185px;height:195px;position:relative;filter:drop-shadow(0 7px 4px #20302344)}
 .head{position:absolute;width:145px;height:125px;left:20px;top:5px;background:#e13e49;border:5px solid #471d25;border-radius:50% 50% 46% 46%}
 .horn{position:absolute;width:28px;height:43px;background:#f5eee5;border:5px solid #471d25;border-radius:70% 20%;top:-24px}.h1{left:16px;transform:rotate(-25deg)}.h2{right:16px;transform:scaleX(-1) rotate(-25deg)}
 .eye{position:absolute;width:45px;height:53px;background:#fff;border:5px solid #321b20;border-radius:50%;top:33px}.e1{left:19px}.e2{right:19px}.eye:after{content:"";position:absolute;width:23px;height:32px;border-radius:50%;background:#25aee4;border:6px solid #17232c;left:6px;top:8px;box-shadow:inset 6px 3px #fff}
 .pac{position:absolute;left:48px;top:87px;width:50px;height:33px;border-radius:50%;background:#f0d9f1;border:5px solid #422438}.pac:after{content:"";position:absolute;width:22px;height:22px;background:#f69a26;border:5px solid #65371c;border-radius:50%;left:9px;top:7px}
 .body{position:absolute;width:105px;height:95px;background:#d93c47;border:5px solid #471d25;border-radius:48%;left:40px;top:105px}.belly{position:absolute;width:55px;height:70px;background:#efc6aa;border-radius:50%;left:20px;top:12px}
 .wing{position:absolute;width:62px;height:73px;background:#d77f9c;border:5px solid #471d25;border-radius:70% 20% 60%;top:105px}.w1{left:5px;transform:rotate(-28deg)}.w2{right:5px;transform:scaleX(-1) rotate(-28deg)}
-.hpwrap{padding:4px 14px 0;background:#0b291e}.bar{height:18px;background:#111;border:3px solid #d9e0dd;border-radius:15px;overflow:hidden;position:relative;margin-bottom:7px}.fill{height:100%;width:100%;transition:.35s}.enemy{background:#f22949}.player{background:#35dc69}.num{position:absolute;right:8px;top:-1px;font-weight:1000;font-size:15px;text-shadow:0 2px #000}.heart{position:absolute;left:-1px;top:-4px;font-size:24px;z-index:3}
-#status{text-align:center;font-size:12px;font-weight:900;min-height:21px;background:#0b291e}
-.board{margin:0 9px 10px;padding:5px;background:#173c28;border:3px solid #466b45;border-radius:16px;display:grid;grid-template-columns:repeat(6,1fr);gap:4px;touch-action:none}
-.ball{aspect-ratio:1;border-radius:50%;position:relative;border:2px solid #ffffff45;box-shadow:inset -7px -9px 11px #0003,inset 5px 6px 10px #fff7,0 2px 3px #0008;transition:.08s transform,.12s opacity}
-.ball:before{content:"";position:absolute;inset:4%;border-radius:50%;opacity:.24;background-image:radial-gradient(circle,#102018 0 1px,transparent 1.8px);background-size:8px 8px}
-.ball:after{position:absolute;inset:0;display:grid;place-items:center;font-size:27px;font-weight:1000;text-shadow:0 2px 2px #0005}
-.red{background:#e64b4b}.red:after{content:"♨";color:#791d18}.blue{background:#58aee5}.blue:after{content:"●";color:#0762bd}.green{background:#50bd72}.green:after{content:"◆";color:#08783c;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}.yellow{background:#efd24e}.yellow:after{content:"ϟ";color:#9a6b00;font-size:35px}.purple{background:#9a60cf}.purple:after{content:"✺";color:#4e1b79}.pink{background:#f29aba}.pink:after{content:"♥";color:#e52e78}
-.sel{transform:scale(1.18);outline:3px solid #fff;z-index:6;filter:brightness(1.12);box-shadow:0 0 0 4px #ffffff55,0 8px 16px #0007}
-.fx{position:absolute;left:50%;top:41%;transform:translate(-50%,-50%);z-index:20;font-size:38px;font-weight:1000;color:white;text-shadow:0 4px #251b18,0 0 14px #fff;opacity:0;white-space:nowrap;pointer-events:none}.show{animation:pop .75s}@keyframes pop{15%{opacity:1;transform:translate(-50%,-50%) scale(1.35)}70%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0}}.shake{animation:shake .35s}@keyframes shake{25%{transform:translateX(-55%) rotate(-5deg)}50%{transform:translateX(-45%) rotate(5deg)}75%{transform:translateX(-53%)}}
-.shot{position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;z-index:15;box-shadow:inset -3px -3px 4px #999;pointer-events:none;transition:.32s ease-in}
-.over{display:none;position:absolute;inset:0;background:#061712e9;z-index:50;align-items:center;justify-content:center;text-align:center}.over.on{display:flex}.over h1{font-size:46px;margin:0 0 10px}.over button{border:0;border-radius:30px;padding:14px 28px;font-size:17px;font-weight:900;background:#f2d55e}.foot{text-align:center;padding:0 0 14px;font-weight:1000;font-size:22px}.foot small{display:block;font-size:10px;letter-spacing:2px}
-</style></head>
-<body><main id="app">
-<section class="hero" id="hero"><div class="logo">パズゴル<span class="sub">GOLF × PUZZLE</span></div><div class="stage"><b>STAGE 1</b><br>越谷ベビードラゴン<span class="turn"><em>あと</em> <span id="turn">2</span></span></div><div class="menu">☰ Menu</div>
-<div class="dragon" id="dragon"><div class="wing w1"></div><div class="wing w2"></div><div class="body"><div class="belly"></div></div><div class="head"><div class="horn h1"></div><div class="horn h2"></div><div class="eye e1"></div><div class="eye e2"></div><div class="pac"></div></div></div></section>
-<section class="hpwrap"><div class="bar"><div class="fill enemy" id="eh"></div><span class="num" id="en">5,000 / 5,000</span></div><div style="display:flex;align-items:center;gap:7px;margin:1px 1px 3px;font-size:12px;font-weight:1000"><span style="background:#fff;color:#173126;border-radius:12px;padding:2px 8px">あなたのHP</span><span style="opacity:.85">ピンクで回復</span></div><div class="bar"><span class="heart">💗</span><div class="fill player" id="ph"></div><span class="num" id="pn">3,200 / 3,200</span></div></section>
-<div id="status">ゴルフボールを押したまま動かそう！</div><div class="board" id="board"></div><div class="foot">パズゴル<small>GOLF GUTS</small></div><div class="fx" id="fx"></div>
-<div class="over" id="over"><div><h1 id="result"></h1><p id="message"></p><button onclick="location.reload()">もう一度</button></div></div>
+
+.enemyhud{position:absolute;z-index:6;bottom:11px;left:18px;right:18px;padding:7px 10px 8px;border:1px solid #ffffff45;border-radius:12px;background:#123125e8;box-shadow:0 5px 12px #132a2644}
+.hud-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;line-height:1.1;font-size:11px}
+.hud-row strong{font-weight:900}.enemy-tag{color:#ffd8d7;font-size:10px}.enemy-tag::before{content:"";display:inline-block;width:6px;height:6px;margin-right:5px;border-radius:50%;background:#fb7274}
+.attack-count{font-size:10px;color:#f4e6d4;white-space:nowrap}.attack-count b{color:#ffd3a0;font-size:12px}.attack-count.soon b{color:#ff9393}
+.meter-row{display:flex;align-items:center;gap:8px}.bar{height:11px;background:#071510;border:1px solid #e1f0e548;border-radius:30px;overflow:hidden;position:relative;flex:1;min-width:0}
+.bar i{position:absolute;inset:0;transform-origin:left center;transition:transform .32s ease-out}.bar .damage-trail{background:#ffe8a0;transition-delay:.13s;transition-duration:.6s}.bar .enemy-fill{background:linear-gradient(#ffa5a8,#ee5264 60%,#bb354a)}
+.hp-number{font-variant-numeric:tabular-nums;font-size:11px;white-space:nowrap;min-width:94px;text-align:right;font-weight:800}
+.playerhud{flex:0 0 auto;margin:15px 12px 0;padding:10px 11px 11px;background:linear-gradient(120deg,#123c30,#0b2e26);border:1px solid #84b79b7d;border-left:3px solid #9be9c5;border-radius:13px;position:relative;z-index:1;box-shadow:0 6px 14px #001b1933}
+.player-title{display:flex;align-items:center;gap:6px;font-size:13px;color:#f1fff7}.player-title .heart{font-size:18px;color:#f1a4c6;line-height:16px}.heal-note{color:#d5b1c3;font-size:10px;white-space:nowrap}.playerhud .bar{height:13px}.player-fill{background:linear-gradient(#b8f9d5,#58c598 64%,#26825c)}.playerhud.low{border-color:#e08a89}.playerhud.low .player-fill{background:#e18484}
+#status{min-height:30px;height:30px;flex:0 0 30px;display:flex;align-items:center;justify-content:center;padding:0 12px;color:#d1e9dd;font-size:10px;font-weight:700;text-align:center;line-height:1.25}
+.board-shell{flex:0 0 auto;margin:0 12px;padding:6px;border:2px solid #668567;border-radius:16px;background:#193e2c;box-shadow:0 8px 22px #02120e5e;position:relative}
+#board{position:relative;width:100%;aspect-ratio:6/5;touch-action:none;outline:none;overflow:visible}
+#board:focus-visible{outline:2px solid #d6eebb;outline-offset:8px;border-radius:10px}
+.cells{position:absolute;inset:0;display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(5,1fr);overflow:hidden;border-radius:8px;pointer-events:none}
+.cell{background:linear-gradient(145deg,#234c33,#163621);box-shadow:inset -1px -1px #071e215a}.cell.alt{background:linear-gradient(145deg,#193c2a,#0d2b21)}
+.pieces{position:absolute;inset:0;pointer-events:none;border-radius:8px;overflow:visible}.resolving .pieces{overflow:hidden}
+.tile{position:absolute;left:0;top:0;will-change:transform;contain:layout style;pointer-events:none;z-index:2}.orb{display:block;width:100%;height:100%;filter:drop-shadow(0 2px 2px #041a1d99);transition:transform .12s ease,opacity .16s ease;transform-origin:50% 50%}.tile svg{width:100%;height:100%;display:block;overflow:visible;pointer-events:none}
+.tile.held{z-index:12}.tile.held .orb{transform:scale(1.12);filter:drop-shadow(0 0 3px #fff) drop-shadow(0 7px 4px #061c2077)}
+.tile.matched .orb{transform:scale(.22);opacity:0}.tile.keyboard-picked .orb{filter:drop-shadow(0 0 3px #fff)}
+#slot{position:absolute;inset:auto;border:2px solid #ffefb799;border-radius:50%;background:#fff5ba1a;box-shadow:inset 0 0 10px #ffffce44;z-index:1;display:none;pointer-events:none}
+.foot{flex:0 0 31px;height:31px;display:flex;align-items:center;justify-content:space-between;padding:0 17px;color:#86ad9d;font-size:9px;letter-spacing:.5px}.foot strong{font-size:10px;color:#aac6b8;letter-spacing:1px}.build{font-variant-numeric:tabular-nums}
+#effects{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:30}.flyball{position:absolute;left:0;top:0;width:24px;height:24px;will-change:transform;filter:drop-shadow(0 3px 4px #ffffff70)}.flyball svg{display:block;width:100%;height:100%}
+.combo-pop,.float-text{position:absolute;left:0;top:0;white-space:nowrap;font-weight:1000;text-shadow:0 2px 0 #193226,1px 0 #193226,-1px 0 #193226;pointer-events:none}.combo-pop{font-size:20px;color:#fff5bd}.float-text{font-size:18px}.float-text.heal{color:#ffbedd}.float-text.damage{color:#fff0c5;font-size:24px}.spark{position:absolute;width:50px;height:50px;border:3px solid #ffefbe;border-radius:50%;box-shadow:0 0 12px #ffdfac;pointer-events:none}
+#battle-word{position:absolute;left:5%;right:5%;top:20%;text-align:center;font-size:32px;font-weight:1000;color:#fff6df;line-height:1.12;white-space:normal;text-shadow:0 3px #4a342a,2px 0 #4a342a,-2px 0 #4a342a;opacity:0;pointer-events:none;z-index:35}
+.dialog-layer{position:absolute;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;background:#041510e8;backdrop-filter:blur(5px);padding:24px;touch-action:pan-y}
+.sheet{background:#11382e;border:1px solid #86baa17d;border-radius:20px;padding:23px;max-width:350px;width:100%;max-height:95%;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;box-shadow:0 18px 50px #0008;user-select:text}
+.sheet h1{font-size:35px;margin:0 0 10px;color:#fff1b3}.sheet h2{font-size:23px;margin:0 0 17px}.sheet p{font-size:13px;line-height:1.8;color:#d5e8dc}.sheet small{color:#b0c8ba;font-size:11px;line-height:1.7;display:block}.sheet button{display:block;width:100%;padding:13px;border:0;border-radius:11px;font-size:14px;font-weight:900;margin-top:12px;background:#e9d291;color:#22392c}.sheet .secondary{background:#234d40;border:1px solid #729c83;color:#e3f2e7}.stats{display:flex;justify-content:space-between;margin:16px 0;font-size:12px;color:#c9dfd0}.sprite-defs{position:absolute;width:0;height:0;overflow:hidden}
+@media(prefers-reduced-motion:reduce){.orb,.bar i{transition:none!important}}
+@media(max-height:610px){.topbar{top:9px}.logo{font-size:24px}.stage-title{top:65px;font-size:10px;left:13px}.stage-title small{font-size:8px}.menu{padding:7px 11px}.playerhud{margin-top:10px;padding:8px 10px}.foot{height:26px;flex-basis:26px}.enemyhud{left:13px;right:13px;bottom:8px}.hero::after{display:none}}
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" class="sprite-defs" aria-hidden="true"><defs><linearGradient id="dimpleShade" x1="0" y1="0" x2="0.2" y2="1"><stop stop-color="#092a2b" stop-opacity=".26"/><stop offset=".48" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".36"/></linearGradient><g id="dimples"><ellipse cx="36.20" cy="13.00" rx="3.31" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="45.60" cy="13.00" rx="3.58" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="55.00" cy="13.00" rx="3.56" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="64.40" cy="13.00" rx="3.29" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="22.10" cy="22.20" rx="2.91" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="31.50" cy="22.20" rx="3.18" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="40.90" cy="22.20" rx="3.44" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="50.30" cy="22.20" rx="3.69" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="59.70" cy="22.20" rx="3.43" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="69.10" cy="22.20" rx="3.16" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="78.50" cy="22.20" rx="2.90" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="17.40" cy="31.40" rx="2.78" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="26.80" cy="31.40" rx="3.05" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="36.20" cy="31.40" rx="3.31" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="45.60" cy="31.40" rx="3.58" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="55.00" cy="31.40" rx="3.56" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="64.40" cy="31.40" rx="3.29" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="73.80" cy="31.40" rx="3.03" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="83.20" cy="31.40" rx="2.77" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="12.70" cy="40.60" rx="2.65" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="22.10" cy="40.60" rx="2.91" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="31.50" cy="40.60" rx="3.18" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="40.90" cy="40.60" rx="3.44" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="50.30" cy="40.60" rx="3.69" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="59.70" cy="40.60" rx="3.43" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="69.10" cy="40.60" rx="3.16" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="78.50" cy="40.60" rx="2.90" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="87.90" cy="40.60" rx="2.63" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="17.40" cy="49.80" rx="2.78" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="26.80" cy="49.80" rx="3.05" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="36.20" cy="49.80" rx="3.31" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="45.60" cy="49.80" rx="3.58" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="55.00" cy="49.80" rx="3.56" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="64.40" cy="49.80" rx="3.29" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="73.80" cy="49.80" rx="3.03" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="83.20" cy="49.80" rx="2.77" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="12.70" cy="59.00" rx="2.65" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="22.10" cy="59.00" rx="2.91" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="31.50" cy="59.00" rx="3.18" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="40.90" cy="59.00" rx="3.44" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="50.30" cy="59.00" rx="3.69" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="59.70" cy="59.00" rx="3.43" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="69.10" cy="59.00" rx="3.16" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="78.50" cy="59.00" rx="2.90" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="87.90" cy="59.00" rx="2.63" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="17.40" cy="68.20" rx="2.78" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="26.80" cy="68.20" rx="3.05" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="36.20" cy="68.20" rx="3.31" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="45.60" cy="68.20" rx="3.58" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="55.00" cy="68.20" rx="3.56" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="64.40" cy="68.20" rx="3.29" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="73.80" cy="68.20" rx="3.03" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="83.20" cy="68.20" rx="2.77" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="22.10" cy="77.40" rx="2.91" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="31.50" cy="77.40" rx="3.18" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="40.90" cy="77.40" rx="3.44" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="50.30" cy="77.40" rx="3.69" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="59.70" cy="77.40" rx="3.43" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="69.10" cy="77.40" rx="3.16" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="78.50" cy="77.40" rx="2.90" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="36.20" cy="86.60" rx="3.31" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="45.60" cy="86.60" rx="3.58" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="55.00" cy="86.60" rx="3.56" ry="3.0" fill="url(#dimpleShade)"/><ellipse cx="64.40" cy="86.60" rx="3.29" ry="3.0" fill="url(#dimpleShade)"/></g><radialGradient id="shade-red" cx=".28" cy=".22" r=".86"><stop stop-color="#ffb1a0"/><stop offset=".47" stop-color="#e75956"/><stop offset="1" stop-color="#ab2639"/></radialGradient><symbol id="orb-red" viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="url(#shade-red)" stroke="#ffb1a0" stroke-opacity=".78" stroke-width="1.5"/><use href="#dimples"/><g transform="translate(24 25) scale(1.04)" fill="#8d1729" style="color:#8d1729"><path d="M27 4C31 17 17 20 19 32C13 29 13 24 14 21C1 32 9 48 25 48C44 48 50 32 37 21C39 31 31 33 30 28C34 16 28 14 27 4Z"/></g><ellipse cx="30" cy="22" rx="11" ry="6" transform="rotate(-37 30 22)" fill="#fff" opacity=".75"/><path d="M18 76Q49 109 82 76" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="2"/></symbol><radialGradient id="shade-blue" cx=".28" cy=".22" r=".86"><stop stop-color="#c5f0ff"/><stop offset=".47" stop-color="#68b7dc"/><stop offset="1" stop-color="#287bae"/></radialGradient><symbol id="orb-blue" viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="url(#shade-blue)" stroke="#c5f0ff" stroke-opacity=".78" stroke-width="1.5"/><use href="#dimples"/><g transform="translate(24 25) scale(1.04)" fill="#095482" style="color:#095482"><path d="M25 3C20 14 8 23 8 33A17 17 0 0 0 42 33C42 23 30 13 25 3Z"/><path d="M15 31Q13 40 23 42" fill="none" stroke="#ffffff" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/></g><ellipse cx="30" cy="22" rx="11" ry="6" transform="rotate(-37 30 22)" fill="#fff" opacity=".75"/><path d="M18 76Q49 109 82 76" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="2"/></symbol><radialGradient id="shade-green" cx=".28" cy=".22" r=".86"><stop stop-color="#b6f2c5"/><stop offset=".47" stop-color="#63be89"/><stop offset="1" stop-color="#287b53"/></radialGradient><symbol id="orb-green" viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="url(#shade-green)" stroke="#b6f2c5" stroke-opacity=".78" stroke-width="1.5"/><use href="#dimples"/><g transform="translate(24 25) scale(1.04)" fill="#125e36" style="color:#125e36"><path d="M44 5C23 6 7 10 7 27C7 36 15 44 25 40C42 35 42 20 44 5Z"/><path d="M10 44Q17 26 36 15" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M16 33L35 16" fill="none" stroke="#ffffff" stroke-opacity=".45" stroke-width="2.5"/></g><ellipse cx="30" cy="22" rx="11" ry="6" transform="rotate(-37 30 22)" fill="#fff" opacity=".75"/><path d="M18 76Q49 109 82 76" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="2"/></symbol><radialGradient id="shade-yellow" cx=".28" cy=".22" r=".86"><stop stop-color="#fff6b7"/><stop offset=".47" stop-color="#ecd269"/><stop offset="1" stop-color="#bb8e27"/></radialGradient><symbol id="orb-yellow" viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="url(#shade-yellow)" stroke="#fff6b7" stroke-opacity=".78" stroke-width="1.5"/><use href="#dimples"/><g transform="translate(24 25) scale(1.04)" fill="#986813" style="color:#986813"><path d="M29 2L8 28H23L18 49L44 19H29L35 2Z"/></g><ellipse cx="30" cy="22" rx="11" ry="6" transform="rotate(-37 30 22)" fill="#fff" opacity=".75"/><path d="M18 76Q49 109 82 76" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="2"/></symbol><radialGradient id="shade-purple" cx=".28" cy=".22" r=".86"><stop stop-color="#e9d4ff"/><stop offset=".47" stop-color="#af83d8"/><stop offset="1" stop-color="#6e40a1"/></radialGradient><symbol id="orb-purple" viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="url(#shade-purple)" stroke="#e9d4ff" stroke-opacity=".78" stroke-width="1.5"/><use href="#dimples"/><g transform="translate(24 25) scale(1.04)" fill="#522075" style="color:#522075"><path d="M25 7C8 5 3 20 8 31C8 19 17 17 23 21C8 25 16 45 30 42C19 40 18 31 23 28C26 44 46 39 46 23C44 35 33 35 30 29C46 23 40 6 29 5C38 10 36 21 30 23C30 17 23 14 18 18C18 11 21 9 25 7Z"/></g><ellipse cx="30" cy="22" rx="11" ry="6" transform="rotate(-37 30 22)" fill="#fff" opacity=".75"/><path d="M18 76Q49 109 82 76" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="2"/></symbol><radialGradient id="shade-pink" cx=".28" cy=".22" r=".86"><stop stop-color="#ffe5f1"/><stop offset=".47" stop-color="#ee99bf"/><stop offset="1" stop-color="#bf5088"/></radialGradient><symbol id="orb-pink" viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="url(#shade-pink)" stroke="#ffe5f1" stroke-opacity=".78" stroke-width="1.5"/><use href="#dimples"/><g transform="translate(24 25) scale(1.04)" fill="#b62c6b" style="color:#b62c6b"><path d="M25 45L7 28C-4 16 10-1 25 12C40-1 54 16 43 28Z"/></g><ellipse cx="30" cy="22" rx="11" ry="6" transform="rotate(-37 30 22)" fill="#fff" opacity=".75"/><path d="M18 76Q49 109 82 76" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="2"/></symbol></defs></svg>
+<div id="viewport">
+<main id="app" aria-label="パズゴル STAGE 1">
+<section class="hero" id="hero" aria-label="敵エリア">
+  <header class="topbar"><div class="logo">パズゴル<small>GOLF × PUZZLE</small></div><button class="menu" id="menuButton" aria-label="遊び方を開く">☰ メニュー</button></header>
+  <div class="stage-title"><small>STAGE 01</small>越谷ベビードラゴン</div>
+  <div class="dragon-anchor" id="dragonAnchor"><div class="dragon" id="dragon"><div class="wing w1"></div><div class="wing w2"></div><div class="body"><div class="belly"></div></div><div class="head"><div class="horn h1"></div><div class="horn h2"></div><div class="eye e1"></div><div class="eye e2"></div><div class="pac"></div></div></div></div>
+  <div class="enemyhud" id="enemyHud">
+    <div class="hud-row"><strong class="enemy-tag">敵のHP</strong><span class="attack-count" id="attackCount">攻撃まで <b id="turnCount">あと2ターン</b></span></div>
+    <div class="meter-row"><div class="bar" id="enemyBar" role="progressbar" aria-label="越谷ベビードラゴンのHP" aria-valuemin="0" aria-valuemax="5000" aria-valuenow="5000"><i class="damage-trail" id="enemyTrail"></i><i class="enemy-fill" id="enemyFill"></i></div><span class="hp-number" id="enemyNumber">5,000 / 5,000</span></div>
+  </div>
+</section>
+<section class="playerhud" id="playerHud" aria-label="あなたのHP">
+  <div class="hud-row"><strong class="player-title"><span class="heart" aria-hidden="true">♥</span>あなたのHP</strong><span class="heal-note">ピンクを消すと回復</span></div>
+  <div class="meter-row"><div class="bar" id="playerBar" role="progressbar" aria-label="あなたのHP" aria-valuemin="0" aria-valuemax="3200" aria-valuenow="3200"><i class="player-fill" id="playerFill"></i></div><span class="hp-number" id="playerNumber">3,200 / 3,200</span></div>
+</section>
+<div id="status" aria-live="polite">ボールを押したまま動かそう</div>
+<div class="board-shell" id="boardShell"><div id="board" tabindex="0" role="application" aria-label="6列5行のパズル。指でボールを持って動かし、同じ色を縦横3個以上に揃えます。キーボードでは矢印キーで選択、スペースで持ち、もう一度スペースで離します。"><div class="cells" id="cells" aria-hidden="true"></div><div id="slot" aria-hidden="true"></div><div class="pieces" id="pieces" aria-hidden="true"></div></div></div>
+<footer class="foot"><strong>GOLF GUTS</strong><span class="build">操作改善 v0.5</span></footer>
+<div id="effects" aria-hidden="true"></div><div id="battle-word" aria-hidden="true"></div>
+<div class="dialog-layer" id="helpLayer" hidden><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="helpTitle"><h2 id="helpTitle">あそび方</h2><p>ボールを1つ押したまま、なぞって入れ替えます。指を離すと、同じ色が縦・横に3個以上並んだ場所が消えます。</p><p>ピンクは回復、ほかの5色は攻撃。コンボが増えるほどダメージと演出が大きくなります。</p><p>盤面の外へ指がはみ出しても、ページ内なら操作を維持します。戻ってそのまま続けられます。</p><small>操作確認版：操作時間の制限なし。敵は2ターンに1回攻撃します。揃わなかった手は従来どおりターンを消費しません。端末操作などで入力が中断された場合、その手を元に戻します。モンスターは仮表示です。</small><button id="helpClose">ゲームに戻る</button><button class="secondary" id="resetButton">最初からやり直す</button></section></div>
+<div class="dialog-layer" id="resultLayer" hidden><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="resultTitle"><h1 id="resultTitle">CLEAR!</h1><p id="resultMessage"></p><div class="stats"><span id="resultTurns"></span><span id="resultCombo"></span></div><button id="retryButton">もう一度あそぶ</button></section></div>
 </main>
+</div>
 <script>
-const COLORS=['red','blue','green','yellow','purple','pink'], board=document.getElementById('board');
-let grid=[],drag=false,current=-1,busy=false,enemyHP=5000,playerHP=3200,turn=0;
-const wait=n=>new Promise(r=>setTimeout(r,n)), rnd=()=>COLORS[Math.floor(Math.random()*6)];
-function matches(){let s=new Set;for(let r=0;r<5;r++){let q=0;for(let c=1;c<=6;c++){if(c<6&&grid[r*6+c]===grid[r*6+q])continue;if(c-q>=3)for(let k=q;k<c;k++)s.add(r*6+k);q=c}}for(let c=0;c<6;c++){let q=0;for(let r=1;r<=5;r++){if(r<5&&grid[r*6+c]===grid[q*6+c])continue;if(r-q>=3)for(let k=q;k<r;k++)s.add(k*6+c);q=r}}return s}
-function init(){do{grid=Array.from({length:30},rnd)}while(matches().size);draw()} function draw(){board.innerHTML='';grid.forEach((c,i)=>{let d=document.createElement('div');d.className='ball '+c;d.dataset.i=i;board.appendChild(d)})} init();
-function at(x,y){for(let i=0;i<board.children.length;i++){let r=board.children[i].getBoundingClientRect();if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom)return i}return-1}
-let activePointer=null;
-board.onpointerdown=e=>{if(busy)return;let i=at(e.clientX,e.clientY);if(i<0)return;drag=true;current=i;activePointer=e.pointerId;board.setPointerCapture(e.pointerId);board.children[i].classList.add('sel');e.preventDefault()}
-window.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==activePointer)return;
-  const br=board.getBoundingClientRect();
-  const pad=95;
-  if(e.clientX<br.left-pad||e.clientX>br.right+pad||e.clientY<br.top-pad||e.clientY>br.bottom+pad)return;
-  let x=Math.max(br.left+2,Math.min(br.right-2,e.clientX)),y=Math.max(br.top+2,Math.min(br.bottom-2,e.clientY));
-  let n=at(x,y);if(n<0||n===current)return;
-  let r=Math.floor(current/6),c=current%6,R=Math.floor(n/6),C=n%6;
-  while(Math.abs(r-R)+Math.abs(c-C)>0){
-    let nr=r,nc=c;if(Math.abs(C-c)>=Math.abs(R-r))nc+=Math.sign(C-c);else nr+=Math.sign(R-r);
-    let next=nr*6+nc;[grid[current],grid[next]]=[grid[next],grid[current]];
-    let oldEl=board.children[current],newEl=board.children[next];oldEl.className='ball '+grid[current];newEl.className='ball '+grid[next]+' sel';
-    current=next;r=nr;c=nc;
+/* パズゴル v0.5 — input/HUD update, 2026-09-17
+ * Self-contained: no accounts, tracking, external libraries, or network requests.
+ * Tile identities and DOM nodes persist through a drag. A single animation loop
+ * draws held tiles at the finger and interpolates displaced tiles into vacancies.
+ */
+(() => {
+  'use strict';
+  const VERSION = '0.5';
+  const COLS = 6, ROWS = 5, SIZE = COLS * ROWS;
+  const COLORS = ['red', 'blue', 'green', 'yellow', 'purple', 'pink'];
+  const LABELS = ['赤・炎', '青・水滴', '緑・葉', '黄・雷', '紫・渦', 'ピンク・回復'];
+  const CONFIG = Object.freeze({ enemyMax:5000, playerMax:3200, enemyAttack:520,
+    enemyEvery:2, attackPerBall:42, comboStep:.38, healPerBall:38, healComboStep:.2 });
+  const $ = id => document.getElementById(id);
+  const ui = { app:$('app'), viewport:$('viewport'), hero:$('hero'), board:$('board'),
+    shell:$('boardShell'), cells:$('cells'), pieces:$('pieces'), slot:$('slot'),
+    status:$('status'), enemyHud:$('enemyHud'), enemyBar:$('enemyBar'),
+    enemyFill:$('enemyFill'), enemyTrail:$('enemyTrail'), enemyNumber:$('enemyNumber'),
+    playerHud:$('playerHud'), playerBar:$('playerBar'), playerFill:$('playerFill'),
+    playerNumber:$('playerNumber'), count:$('turnCount'), attackCount:$('attackCount'),
+    dragon:$('dragon'), anchor:$('dragonAnchor'), effects:$('effects'), word:$('battle-word'),
+    menu:$('menuButton'), help:$('helpLayer'), result:$('resultLayer') };
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const state = { phase:'ready', grid:[], tiles:new Map(), nextId:1, drag:null,
+    turn:0, enemy:CONFIG.enemyMax, player:CONFIG.playerMax, maxCombo:0,
+    epoch:0, geometry:null, keyboardIndex:0, lastResult:null, refillQueue:[] };
+  let frameId=0, lastFrame=0, layoutFrame=0, wordAnimation=null, dragonAnimation=null;
+  let rng=Math.random;
+  const clamp=(n,min,max)=>Math.min(max,Math.max(min,n));
+  const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  const motion=ms=>reducedMotion.matches?Math.min(ms,45):ms;
+  const randomColor=()=>state.refillQueue.length ? state.refillQueue.shift() : Math.floor(rng()*6);
+  class StaleRun extends Error {}
+  async function wait(ms,epoch){await pause(ms);if(epoch!==state.epoch)throw new StaleRun();}
+  function setStatus(text){ui.status.textContent=text;}
+  function modalMode(open){ui.viewport.classList.toggle('modal-open',open);ui.app.classList.toggle('modal-open',open);}
+  function setPhase(phase){state.phase=phase;ui.app.dataset.phase=phase;ui.menu.disabled=phase!=='ready';}
+
+  // Pure match rules. 4/5/6 in a straight line disappear as one group;
+  // touching horizontal/vertical matches of the same color are a single combo.
+  function findGroups(types){
+    const matched=new Set();
+    for(let r=0;r<ROWS;r++){
+      for(let c=0;c<COLS;){let end=c+1;const color=types[r*COLS+c];
+        while(end<COLS&&types[r*COLS+end]===color)end++;
+        if(color!=null&&end-c>=3)for(let x=c;x<end;x++)matched.add(r*COLS+x);
+        c=end;
+      }
+    }
+    for(let c=0;c<COLS;c++){
+      for(let r=0;r<ROWS;){let end=r+1;const color=types[r*COLS+c];
+        while(end<ROWS&&types[end*COLS+c]===color)end++;
+        if(color!=null&&end-r>=3)for(let y=r;y<end;y++)matched.add(y*COLS+c);
+        r=end;
+      }
+    }
+    const seen=new Set(), result=[];
+    for(const start of matched){
+      if(seen.has(start))continue;
+      const stack=[start], cells=[];seen.add(start);
+      while(stack.length){const i=stack.pop();cells.push(i);const r=Math.floor(i/COLS),c=i%COLS;
+        for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]){
+          const nr=r+dr,nc=c+dc,n=nr*COLS+nc;
+          if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS&&matched.has(n)&&!seen.has(n)&&types[n]===types[i]){
+            seen.add(n);stack.push(n);
+          }
+        }
+      }
+      result.push({color:types[start],cells});
+    }
+    return result;
   }
-  if(navigator.vibrate)navigator.vibrate(6);e.preventDefault();
-},{passive:false});
-function release(e){if(!drag||(e.pointerId!==undefined&&activePointer!==null&&e.pointerId!==activePointer))return;drag=false;activePointer=null;try{board.releasePointerCapture(e.pointerId)}catch(_){}resolve()}
-window.addEventListener('pointerup',release);window.addEventListener('pointercancel',release);
-function groups(m){let seen=new Set,gs=[];for(let x of m){if(seen.has(x))continue;let st=[x],g=[];seen.add(x);while(st.length){let z=st.pop();g.push(z);let r=Math.floor(z/6),c=z%6;for(let [dr,dc] of [[1,0],[-1,0],[0,1],[0,-1]]){let R=r+dr,C=c+dc,n=R*6+C;if(R>=0&&R<5&&C>=0&&C<6&&m.has(n)&&!seen.has(n)&&grid[n]===grid[z]){seen.add(n);st.push(n)}}}gs.push(g)}return gs}
-function hitWord(n){return n<=2?'ペチッ！':n<=4?'バシッ！':n<=6?'ドン！！':n<=9?'ドドドドッ！！！':'ULTRA SHOT!!!'}
-function flash(text){fx.textContent=text;fx.classList.remove('show');void fx.offsetWidth;fx.classList.add('show')}
-async function shots(n){let hero=document.getElementById('hero'),hr=hero.getBoundingClientRect(),br=board.getBoundingClientRect();for(let i=0;i<Math.min(14,n);i++){let p=document.createElement('div');p.className='shot';p.style.left=(br.width/2+(Math.random()-.5)*150)+'px';p.style.top=(br.top-hr.top-5)+'px';hero.appendChild(p);requestAnimationFrame(()=>{p.style.transform=`translate(${(Math.random()-.5)*90}px,${-120-Math.random()*80}px) scale(.5)`;p.style.opacity='.1'});setTimeout(()=>p.remove(),360);await wait(25)}}
-async function resolve(){busy=true;let combo=0,attack=0,heal=0;while(1){let m=matches();if(!m.size)break;let gs=groups(m);combo+=gs.length;for(let g of gs){grid[g[0]]==='pink'?heal+=g.length:attack+=g.length}for(let i of m)grid[i]=null;draw();await wait(115);for(let c=0;c<6;c++){let vals=[];for(let r=4;r>=0;r--)if(grid[r*6+c])vals.push(grid[r*6+c]);for(let r=4,k=0;r>=0;r--,k++)grid[r*6+c]=vals[k]||rnd()}draw();await wait(165)}
-if(!combo){status.textContent='揃わなかった！もう一度！';busy=false;return}
-flash(combo+' COMBO!');let mult=1+(combo-1)*.38,dmg=Math.round(attack*42*mult),rec=Math.round(heal*38*(1+(combo-1)*.2));playerHP=Math.min(3200,playerHP+rec);await wait(260);await shots(Math.max(attack,combo*2));flash(hitWord(combo));dragon.classList.add('shake');await wait(350);dragon.classList.remove('shake');enemyHP=Math.max(0,enemyHP-dmg);update();status.textContent=`${combo} COMBO！ ${dmg}ダメージ${rec?' ＋ '+rec+'回復':''}`;if(!enemyHP){end(true);return}
-turn++;if(turn%2===0){await wait(500);flash('バブー！');await wait(450);playerHP=Math.max(0,playerHP-520);update();status.textContent='越谷ベビードラゴンの反撃！ 520ダメージ';if(!playerHP){end(false);return}}busy=false}
-function update(){eh.style.width=enemyHP/50+'%';ph.style.width=playerHP/32+'%';en.textContent=enemyHP.toLocaleString()+' / 5,000';pn.textContent=playerHP.toLocaleString()+' / 3,200';document.getElementById('turn').textContent=2-turn%2}
-function end(win){over.classList.add('on');result.textContent=win?'CLEAR!':'GAME OVER';message.textContent=win?'越谷ベビードラゴンを倒した！':'ベビードラゴンがおしゃぶりをくわえて得意げにしている…'}
-</script></body></html>
+  function hasEasyMove(types){
+    for(let i=0;i<SIZE;i++)for(const n of [i%COLS<COLS-1?i+1:-1,i+COLS<SIZE?i+COLS:-1]){
+      if(n<0)continue;
+      const copy=types.slice();[copy[i],copy[n]]=[copy[n],copy[i]];
+      if(findGroups(copy).length)return true;
+    }
+    return false;
+  }
+  function freshTypes(){
+    let types=[];
+    for(let attempt=0;attempt<100;attempt++){
+      types=[];
+      for(let i=0;i<SIZE;i++){
+        const possible=COLORS.map((_,c)=>c).filter(c=>
+          !(i%COLS>=2&&types[i-1]===c&&types[i-2]===c)&&
+          !(i>=COLS*2&&types[i-COLS]===c&&types[i-COLS*2]===c));
+        types.push(possible[Math.floor(rng()*possible.length)]);
+      }
+      if(hasEasyMove(types))return types;
+    }
+    return types;
+  }
+  function currentTypes(){return state.grid.map(tile=>tile?tile.color:null);}
+  function center(index){const g=state.geometry;return {x:(index%COLS+.5)*g.step,y:(Math.floor(index/COLS)+.5)*g.step};}
+  function orbMarkup(color){return `<span class="orb"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#orb-${COLORS[color]}"></use></svg></span>`;}
+  function createTile(color,index,startRow){
+    const tile={id:state.nextId++,color,index,x:0,y:0,tx:0,ty:0,renderX:NaN,renderY:NaN,el:document.createElement('div')};
+    tile.el.className='tile';tile.el.dataset.id=String(tile.id);tile.el.dataset.color=COLORS[color];
+    tile.el.innerHTML=orbMarkup(color);ui.pieces.appendChild(tile.el);state.tiles.set(tile.id,tile);
+    const pos=center(index);tile.tx=pos.x;tile.ty=pos.y;tile.x=pos.x;tile.y=startRow==null?pos.y:(startRow+.5)*state.geometry.step;
+    sizeTile(tile);paintTile(tile);return tile;
+  }
+  function sizeTile(tile){const d=state.geometry.diameter;tile.el.style.width=d+'px';tile.el.style.height=d+'px';tile.renderX=NaN;}
+  function paintTile(tile){
+    if(tile.renderX===tile.x&&tile.renderY===tile.y)return;
+    const d=state.geometry.diameter;
+    tile.el.style.transform=`translate3d(${(tile.x-d/2).toFixed(2)}px,${(tile.y-d/2).toFixed(2)}px,0)`;
+    tile.el.dataset.index=String(tile.index);tile.renderX=tile.x;tile.renderY=tile.y;
+  }
+  function targetTile(tile,index){tile.index=index;const p=center(index);tile.tx=p.x;tile.ty=p.y;tile.el.dataset.index=String(index);}
+  function requestDraw(){if(!frameId){lastFrame=performance.now();frameId=requestAnimationFrame(drawFrame);}}
+  function drawFrame(now){
+    frameId=0;const dt=clamp(now-lastFrame,1,34);lastFrame=now;
+    const k=reducedMotion.matches?1:1-Math.exp(-dt/34);
+    let stillMoving=false;
+    for(const tile of state.tiles.values()){
+      if(state.drag&&tile===state.drag.tile){tile.x=state.drag.displayX;tile.y=state.drag.displayY;}
+      else {
+        const dx=tile.tx-tile.x,dy=tile.ty-tile.y;
+        if(Math.abs(dx)+Math.abs(dy)>.14){tile.x+=dx*k;tile.y+=dy*k;stillMoving=true;}
+        else{tile.x=tile.tx;tile.y=tile.ty;}
+      }
+      paintTile(tile);
+    }
+    if(stillMoving)frameId=requestAnimationFrame(drawFrame);
+  }
+  function measure(){
+    const r=ui.board.getBoundingClientRect();
+    state.geometry={left:r.left,top:r.top,width:r.width,height:r.height,step:r.width/COLS,diameter:r.width/COLS*.94};
+  }
+  function resize(){
+    layoutFrame=0;
+    if(!ui.app.isConnected)return;
+    const vv=window.visualViewport;
+    const vh=vv?vv.height:window.innerHeight,vw=vv?vv.width:window.innerWidth;
+    const vpStyle=getComputedStyle(ui.viewport);
+    const safeH=(parseFloat(vpStyle.paddingTop)||0)+(parseFloat(vpStyle.paddingBottom)||0);
+    const safeW=(parseFloat(vpStyle.paddingLeft)||0)+(parseFloat(vpStyle.paddingRight)||0);
+    const usableH=Math.max(220,Math.min(870,vh-safeH));
+    const width=Math.min(vw-safeW,460,Math.max(210,(usableH-305)*1.2+40));
+    const willChange=state.geometry&&(Math.abs(ui.app.clientWidth-width)>2);
+    if(willChange&&state.drag)cancelDrag('画面サイズが変わったため、この手を元に戻しました');
+    document.documentElement.style.setProperty('--screen-h',vh+'px');
+    document.documentElement.style.setProperty('--screen-w',vw+'px');
+    document.documentElement.style.setProperty('--app-w',width+'px');
+    const scale=clamp((ui.hero.clientHeight-102)/214,.46,1.16);
+    document.documentElement.style.setProperty('--dragon-scale',scale.toFixed(3));
+    measure();
+    for(const tile of state.tiles.values()){sizeTile(tile);targetTile(tile,tile.index);if(!state.drag){tile.x=tile.tx;tile.y=tile.ty;}paintTile(tile);}
+    if(state.drag){state.drag.lastLocal=null;requestDraw();}
+  }
+  function scheduleLayout(){if(!layoutFrame)layoutFrame=requestAnimationFrame(resize);}
+  function updateHP(){
+    const er=state.enemy/CONFIG.enemyMax,pr=state.player/CONFIG.playerMax;
+    ui.enemyFill.style.transform=`scaleX(${er})`;ui.enemyTrail.style.transform=`scaleX(${er})`;
+    ui.playerFill.style.transform=`scaleX(${pr})`;
+    ui.enemyNumber.textContent=`${state.enemy.toLocaleString('ja-JP')} / 5,000`;
+    ui.playerNumber.textContent=`${state.player.toLocaleString('ja-JP')} / 3,200`;
+    ui.enemyBar.setAttribute('aria-valuenow',String(state.enemy));ui.playerBar.setAttribute('aria-valuenow',String(state.player));
+    ui.playerHud.classList.toggle('low',pr<=.25);
+    const left=CONFIG.enemyEvery-state.turn%CONFIG.enemyEvery;
+    ui.count.textContent=`あと${left}ターン`;ui.attackCount.classList.toggle('soon',left===1);
+  }
+  function resetGame(types){
+    state.epoch++;
+    if(state.drag)cancelDrag('');
+    if(wordAnimation)wordAnimation.cancel();if(dragonAnimation)dragonAnimation.cancel();
+    ui.effects.replaceChildren();ui.word.style.opacity='0';ui.result.hidden=true;ui.help.hidden=true;modalMode(false);
+    ui.shell.classList.remove('resolving');ui.pieces.replaceChildren();state.tiles.clear();
+    state.turn=0;state.enemy=CONFIG.enemyMax;state.player=CONFIG.playerMax;state.maxCombo=0;state.lastResult=null;state.refillQueue=[];
+    setPhase('ready');measure();
+    state.grid=(types||freshTypes()).map((color,index)=>createTile(color,index));
+    state.keyboardIndex=0;ui.slot.style.display='none';updateHP();setStatus('ボールを押したまま動かそう');requestDraw();
+  }
+
+  // Input coordinates are derived from fixed cell geometry, never animated DOM bounds.
+  // Even at high pointer speed, interpolate the observed path across each intervening cell.
+  function localPoint(x,y){const g=state.geometry;return {x:x-g.left,y:y-g.top};}
+  function logicalPoint(p){const g=state.geometry;return {x:clamp(p.x,.001,g.width-.001),y:clamp(p.y,.001,g.height-.001)};}
+  function indexAt(p){const g=state.geometry;return clamp(Math.floor(p.y/g.step),0,ROWS-1)*COLS+clamp(Math.floor(p.x/g.step),0,COLS-1);}
+  function showSlot(index){const g=state.geometry,p=center(index),d=g.diameter*.91;ui.slot.style.cssText=`display:block;width:${d}px;height:${d}px;left:${p.x-d/2}px;top:${p.y-d/2}px`;} 
+  function beginDrag(x,y,pointerId,kind){
+    if(state.phase!=='ready'||!ui.help.hidden||!ui.result.hidden)return false;
+    measure();const p=localPoint(x,y),g=state.geometry;
+    if(p.x<0||p.x>=g.width||p.y<0||p.y>=g.height)return false;
+    const index=indexAt(p),tile=state.grid[index],pos=center(index);
+    if(!tile)return false;
+    state.drag={tile,pointerId,kind,index,moved:false,snapshot:state.grid.slice(),lastLocal:logicalPoint(p),displayX:pos.x,displayY:pos.y,
+      offsetX:pos.x-p.x,offsetY:pos.y-p.y};
+    tile.el.classList.add('held');showSlot(index);setPhase('dragging');
+    setStatus('指を離すまで操作できます · 枠の外から戻ってもOK');requestDraw();return true;
+  }
+  function swapStep(next){
+    const d=state.drag;if(!d||next===d.index)return;
+    const old=d.index,neighbor=state.grid[next];
+    state.grid[old]=neighbor;state.grid[next]=d.tile;targetTile(neighbor,old);targetTile(d.tile,next);
+    d.index=next;d.moved=true;showSlot(next);
+  }
+  function advanceAt(p){
+    const d=state.drag,g=state.geometry;if(!d)return;
+    const dest=indexAt(p);let remaining=COLS+ROWS;
+    // Small hysteresis prevents rapid swapping at a cell boundary.
+    while(d.index!==dest&&remaining-->0){
+      const c=d.index%COLS,r=Math.floor(d.index/COLS),dc=dest%COLS-c,dr=Math.floor(dest/COLS)-r;
+      const pos=center(d.index),dx=(p.x-pos.x)/g.step,dy=(p.y-pos.y)/g.step;
+      let next=-1;
+      if(dc!==0&&Math.abs(dx)>.54&&(dr===0||Math.abs(dx)>=Math.abs(dy)))next=d.index+Math.sign(dc);
+      else if(dr!==0&&Math.abs(dy)>.54)next=d.index+COLS*Math.sign(dr);
+      else break;
+      swapStep(next);
+    }
+  }
+  function moveDrag(x,y){
+    const d=state.drag;if(!d)return;
+    const g=state.geometry,raw=localPoint(x,y),p=logicalPoint(raw),from=d.lastLocal||p;
+    const dist=Math.hypot(p.x-from.x,p.y-from.y);
+    const steps=Math.max(1,Math.ceil(dist/(g.step*.2)));
+    for(let n=1;n<=steps;n++)advanceAt({x:from.x+(p.x-from.x)*n/steps,y:from.y+(p.y-from.y)*n/steps});
+    d.lastLocal=p;
+    // The visible ball may follow a little outside the frame; the logical cell clamps
+    // to the edge. Capture is not released, no matter how far it goes within the page.
+    d.displayX=clamp(raw.x+d.offsetX,-g.step*.12,g.width+g.step*.12);
+    d.displayY=clamp(raw.y+d.offsetY,-g.step*.12,g.height+g.step*.12);
+    requestDraw();
+  }
+  function releaseCapture(d){try{if(d.kind==='pointer'&&ui.board.hasPointerCapture(d.pointerId))ui.board.releasePointerCapture(d.pointerId);}catch(_){}}
+  function cancelDrag(message){
+    const d=state.drag;if(!d)return;
+    state.drag=null;state.grid=d.snapshot;
+    state.grid.forEach((tile,i)=>{targetTile(tile,i);tile.el.classList.remove('held','keyboard-picked');});
+    ui.slot.style.display='none';releaseCapture(d);setPhase('ready');if(message)setStatus(message);requestDraw();
+  }
+  function endDrag(){
+    const d=state.drag;if(!d)return;
+    state.drag=null;d.tile.el.classList.remove('held','keyboard-picked');ui.slot.style.display='none';
+    releaseCapture(d);requestDraw();
+    if(!d.moved){setPhase('ready');setStatus('ボールを押したまま、隣のマスへ動かそう');return;}
+    setPhase('settling');runTurn(state.epoch).catch(onRunError);
+  }
+  function onRunError(error){
+    if(error instanceof StaleRun)return;
+    console.error('Pazugoru:',error);state.drag=null;setPhase('ready');ui.slot.style.display='none';ui.shell.classList.remove('resolving');
+    setStatus('操作を再開できません。メニューから最初からやり直してください');
+  }
+  function prevent(e){if(e.cancelable)e.preventDefault();}
+  if('PointerEvent' in window){
+    ui.board.addEventListener('pointerdown',e=>{
+      if(e.isPrimary===false||(e.pointerType==='mouse'&&e.button!==0))return;
+      if(beginDrag(e.clientX,e.clientY,e.pointerId,'pointer')){prevent(e);try{ui.board.setPointerCapture(e.pointerId);}catch(_){}}
+    },{passive:false});
+    document.addEventListener('pointermove',e=>{
+      if(!state.drag||state.drag.kind!=='pointer'||state.drag.pointerId!==e.pointerId)return;
+      prevent(e);
+      const samples=typeof e.getCoalescedEvents==='function'?e.getCoalescedEvents():[];
+      for(const sample of samples)moveDrag(sample.clientX,sample.clientY);
+      moveDrag(e.clientX,e.clientY);
+    },{passive:false});
+    document.addEventListener('pointerup',e=>{
+      if(!state.drag||state.drag.kind!=='pointer'||state.drag.pointerId!==e.pointerId)return;
+      prevent(e);moveDrag(e.clientX,e.clientY);endDrag();
+    },{passive:false});
+    document.addEventListener('pointercancel',e=>{
+      if(state.drag&&state.drag.kind==='pointer'&&state.drag.pointerId===e.pointerId)cancelDrag('入力が中断されたため、この手を元に戻しました');
+    });
+    ui.board.addEventListener('lostpointercapture',e=>{
+      if(state.drag&&state.drag.kind==='pointer'&&state.drag.pointerId===e.pointerId)cancelDrag('入力が中断されたため、この手を元に戻しました');
+    });
+  } else {
+    // Older touch-only browsers: preserve the initiating touch identifier.
+    ui.board.addEventListener('touchstart',e=>{if(state.drag)return;const t=e.changedTouches[0];if(t&&beginDrag(t.clientX,t.clientY,t.identifier,'touch'))prevent(e);},{passive:false});
+    document.addEventListener('touchmove',e=>{if(!state.drag||state.drag.kind!=='touch')return;const t=[...e.touches].find(t=>t.identifier===state.drag.pointerId);if(t){prevent(e);moveDrag(t.clientX,t.clientY);}},{passive:false});
+    document.addEventListener('touchend',e=>{if(!state.drag||state.drag.kind!=='touch')return;const t=[...e.changedTouches].find(t=>t.identifier===state.drag.pointerId);if(t){prevent(e);moveDrag(t.clientX,t.clientY);endDrag();}},{passive:false});
+    document.addEventListener('touchcancel',()=>cancelDrag('入力が中断されたため、この手を元に戻しました'));
+  }
+  // Safari fallback: do not let a touch that belongs to the game start page scrolling.
+  // The layout itself has no page-sized scroll range. System/browser chrome cannot be captured.
+  document.addEventListener('touchmove',e=>{if(state.drag||(!e.target.closest('.sheet')&&ui.help.hidden&&ui.result.hidden))prevent(e);},{passive:false,capture:true});
+  document.addEventListener('touchstart',e=>{if(state.drag&&e.touches.length>1)prevent(e);},{passive:false,capture:true});
+  document.addEventListener('gesturestart',e=>{if(state.drag||e.target.closest('#board'))prevent(e);},{passive:false});
+  document.addEventListener('gesturechange',e=>{if(state.drag)prevent(e);},{passive:false});
+  ui.app.addEventListener('contextmenu',e=>{if(state.drag||e.target.closest('#board'))prevent(e);});
+  ui.app.addEventListener('dragstart',prevent);
+  window.addEventListener('blur',()=>cancelDrag('操作を中断しました。この手は元に戻っています'));
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelDrag('操作を中断しました。この手は元に戻っています');});
+  window.addEventListener('orientationchange',()=>cancelDrag('画面の向きが変わったため、この手を元に戻しました'));
+  // Keyboard parity; it does not add a second concurrent gesture.
+  ui.board.addEventListener('keydown',e=>{
+    const dirs={ArrowLeft:-1,ArrowRight:1,ArrowUp:-COLS,ArrowDown:COLS};
+    if(e.key==='Escape'&&state.drag&&state.drag.kind==='keyboard'){prevent(e);cancelDrag('操作を取り消しました');return;}
+    if(e.key===' '||e.key==='Enter'){
+      prevent(e);
+      if(state.drag&&state.drag.kind==='keyboard'){state.keyboardIndex=state.drag.index;endDrag();}
+      else if(state.phase==='ready'){const p=center(state.keyboardIndex),g=state.geometry;beginDrag(p.x+g.left,p.y+g.top,-1,'keyboard');}
+      return;
+    }
+    if(!(e.key in dirs)||(state.phase!=='ready'&&!(state.drag&&state.drag.kind==='keyboard')))return;
+    prevent(e);const old=state.drag?state.drag.index:state.keyboardIndex;
+    const next=old+dirs[e.key];if(next<0||next>=SIZE||(e.key==='ArrowLeft'&&old%COLS===0)||(e.key==='ArrowRight'&&old%COLS===COLS-1))return;
+    state.keyboardIndex=next;
+    if(state.drag){const p=center(next),g=state.geometry;moveDrag(p.x+g.left,p.y+g.top);}
+    else{showSlot(next);setStatus(`${Math.floor(next/COLS)+1}行 ${next%COLS+1}列 · ${LABELS[state.grid[next].color]} · スペースで持つ`);}
+  });
+
+  function appPoint(x,y){const r=ui.app.getBoundingClientRect();return {x:x-r.left,y:y-r.top};}
+  function centerOf(el){const r=el.getBoundingClientRect();return appPoint(r.left+r.width/2,r.top+r.height/2);}
+  function animateElement(el,frames,options){
+    if(typeof el.animate==='function')return el.animate(frames,options);
+    Object.assign(el.style,frames[frames.length-1]);return null;
+  }
+  function floating(text,point,className='float-text',duration=700){
+    const el=document.createElement('span');el.className=className;el.textContent=text;ui.effects.appendChild(el);
+    const scale=className==='combo-pop'?1.08:1;
+    const anim=animateElement(el,[
+      {transform:`translate(${point.x}px,${point.y}px) translate(-50%,-50%) scale(.8)`,opacity:0},
+      {transform:`translate(${point.x}px,${point.y-6}px) translate(-50%,-50%) scale(${scale})`,opacity:1,offset:.2},
+      {transform:`translate(${point.x}px,${point.y-26}px) translate(-50%,-50%) scale(1)`,opacity:0}
+    ],{duration:motion(duration),easing:'ease-out',fill:'both'});
+    if(anim)anim.finished.then(()=>el.remove()).catch(()=>el.remove());else setTimeout(()=>el.remove(),duration);
+  }
+  function battleWord(text,n=1){
+    if(wordAnimation)wordAnimation.cancel();ui.word.textContent=text;
+    ui.word.style.top=Math.max(88,ui.hero.clientHeight*.34)+'px';ui.word.style.fontSize=(n>=10?29:n>=7?28:33)+'px';
+    wordAnimation=animateElement(ui.word,[{opacity:0,transform:'scale(.65) rotate(-4deg)'},{opacity:1,transform:'scale(1.13) rotate(-2deg)',offset:.2},{opacity:1,transform:'scale(1)',offset:.65},{opacity:0,transform:'scale(1) translateY(-12px)'}],{duration:motion(730),fill:'both'});
+  }
+  function hitWord(combo){return combo<=2?'ペチッ！':combo<=4?'バシッ！':combo<=6?'ドン！！':combo<=9?'ドドドドッ！！！':'ULTRA SHOT!!';}
+  function impact(point,combo){
+    const el=document.createElement('div');el.className='spark';el.style.left=(point.x-25)+'px';el.style.top=(point.y-25)+'px';ui.effects.appendChild(el);
+    const a=animateElement(el,[{transform:'scale(.3)',opacity:.9},{transform:`scale(${Math.min(2.5,.8+combo*.14)})`,opacity:0}],{duration:motion(220),easing:'ease-out',fill:'both'});
+    if(a)a.finished.then(()=>el.remove()).catch(()=>el.remove());else el.remove();
+  }
+  async function shoot(combo,attackColors,epoch){
+    const count=Math.min(28,Math.max(1,combo*3-2)),g=state.geometry;
+    const destination=centerOf(ui.anchor);
+    destination.y+=ui.anchor.getBoundingClientRect().height*.08;
+    for(let i=0;i<count;i++){
+      const color=attackColors[i%attackColors.length],el=document.createElement('div');el.className='flyball';
+      el.innerHTML=`<svg viewBox="0 0 100 100"><use href="#orb-${COLORS[color]}"></use></svg>`;ui.effects.appendChild(el);
+      const start=appPoint(g.left+g.width*(.18+(i%7)*.1),g.top+g.step*.38);
+      const target={x:destination.x+((i%3)-1)*9,y:destination.y+((i%4)-1.5)*7};
+      const a=animateElement(el,[{transform:`translate(${start.x-12}px,${start.y-12}px) scale(1)`,opacity:1},{transform:`translate(${target.x-12}px,${target.y-12}px) scale(.6)`,opacity:1}],{duration:motion(250),easing:'cubic-bezier(.5,0,.8,.55)',fill:'both'});
+      const done=()=>{el.remove();if(epoch===state.epoch&&!reducedMotion.matches&&i%2===0)impact(target,combo);};
+      if(a)a.finished.then(done).catch(()=>el.remove());else done();
+      await wait(motion(21),epoch);
+    }
+    await wait(motion(240),epoch);
+    battleWord(hitWord(combo),combo);
+    if(dragonAnimation)dragonAnimation.cancel();
+    const strength=Math.min(9,1+combo*1.05);
+    dragonAnimation=animateElement(ui.dragon,[{transform:'translateX(0) rotate(0)'},{transform:`translateX(${strength}px) rotate(${strength*.6}deg)`,offset:.25},{transform:`translateX(${-strength*.5}px) rotate(${-strength*.35}deg)`,offset:.6},{transform:'translateX(0) rotate(0)'}],{duration:motion(320),easing:'ease-out'});
+  }
+  async function collapse(epoch){
+    const next=Array(SIZE).fill(null);
+    for(let c=0;c<COLS;c++){
+      const remaining=[];
+      for(let r=ROWS-1;r>=0;r--)if(state.grid[r*COLS+c])remaining.push(state.grid[r*COLS+c]);
+      const missing=ROWS-remaining.length;
+      for(let k=0;k<remaining.length;k++){const index=(ROWS-1-k)*COLS+c,tile=remaining[k];next[index]=tile;targetTile(tile,index);}
+      for(let r=missing-1;r>=0;r--){const index=r*COLS+c;next[index]=createTile(randomColor(),index,r-missing);}
+    }
+    state.grid=next;requestDraw();await wait(motion(300),epoch);
+  }
+  async function runTurn(epoch){
+    await wait(motion(125),epoch);
+    setPhase('resolving');ui.shell.classList.add('resolving');
+    let combo=0,attackBalls=0,healBalls=0,waves=0;const attackColors=[];
+    let groups=findGroups(currentTypes());
+    if(!groups.length){setPhase('ready');ui.shell.classList.remove('resolving');setStatus('揃わなかった！縦・横に同じ色を3個以上');return;}
+    while(groups.length){
+      for(const group of groups){
+        combo++;if(group.color===5)healBalls+=group.cells.length;else{attackBalls+=group.cells.length;attackColors.push(group.color);}
+        let x=0,y=0;for(const i of group.cells){const p=center(i);x+=p.x;y+=p.y;state.grid[i].el.classList.add('matched');}
+        const p=appPoint(state.geometry.left+x/group.cells.length,state.geometry.top+y/group.cells.length);
+        floating(`${combo} COMBO`,p,'combo-pop',580);setStatus(`${combo} COMBO${group.color===5?' · 回復':'！'}`);
+        await wait(motion(110),epoch);
+      }
+      await wait(motion(90),epoch);
+      for(const group of groups)for(const i of group.cells){const tile=state.grid[i];tile.el.remove();state.tiles.delete(tile.id);state.grid[i]=null;}
+      await collapse(epoch);waves++;groups=findGroups(currentTypes());
+      if(waves>=40&&groups.length){
+        // Practical safety valve for a pathological RNG; do not leave a stuck game.
+        ui.pieces.replaceChildren();state.tiles.clear();state.grid=freshTypes().map((c,i)=>createTile(c,i));groups=[];
+      }
+    }
+    ui.shell.classList.remove('resolving');state.maxCombo=Math.max(state.maxCombo,combo);
+    const damage=Math.round(attackBalls*CONFIG.attackPerBall*(1+(combo-1)*CONFIG.comboStep));
+    const nominalHeal=Math.round(healBalls*CONFIG.healPerBall*(1+(combo-1)*CONFIG.healComboStep));
+    const actualHeal=Math.min(CONFIG.playerMax-state.player,nominalHeal);
+    state.player+=actualHeal;updateHP();
+    if(healBalls){floating(actualHeal?`＋${actualHeal} 回復`:'HP満タン',centerOf(ui.playerHud),'float-text heal',850);}
+    setPhase('attack');
+    if(attackBalls){
+      await shoot(combo,attackColors,epoch);state.enemy=Math.max(0,state.enemy-damage);updateHP();
+      const where=centerOf(ui.enemyHud);where.y-=22;floating(damage.toLocaleString('ja-JP'),where,'float-text damage',800);
+      await wait(motion(390),epoch);
+    }else{battleWord('回復！',combo);await wait(motion(420),epoch);}
+    state.turn++;state.lastResult={combo,damage,heal:actualHeal,healBalls,attackBalls,waves};
+    updateHP();
+    if(state.enemy<=0){finish(true);return;}
+    if(state.turn%CONFIG.enemyEvery===0){
+      setPhase('enemy');ui.count.textContent='攻撃！';setStatus('越谷ベビードラゴンの反撃');battleWord('バブー！');
+      await wait(motion(410),epoch);state.player=Math.max(0,state.player-CONFIG.enemyAttack);updateHP();
+      animateElement(ui.playerHud,[{transform:'translateX(0)'},{transform:'translateX(-4px)',offset:.25},{transform:'translateX(4px)',offset:.5},{transform:'translateX(0)'}],{duration:motion(240)});
+      floating(`−${CONFIG.enemyAttack}`,centerOf(ui.playerHud),'float-text damage',700);
+      if(state.player<=0){await wait(motion(430),epoch);finish(false);return;}
+      setStatus(`${combo} COMBO · ${damage}ダメージ${actualHeal?' / ＋'+actualHeal+'回復':''} · 反撃 −520`);
+    }else setStatus(`${combo} COMBO · ${damage}ダメージ${actualHeal?' / ＋'+actualHeal+'回復':''}`);
+    setPhase('ready');
+  }
+  function finish(win){
+    setPhase('ended');ui.result.hidden=false;modalMode(true);
+    $('resultTitle').textContent=win?'CLEAR!':'GAME OVER';
+    $('resultMessage').textContent=win?'越谷ベビードラゴンを倒した！':'ベビードラゴンの勝ち！ピンクの回復も狙って、もう一度。';
+    $('resultTurns').textContent=`${state.turn} ターン`;$('resultCombo').textContent=`最高 ${state.maxCombo} COMBO`;
+    $('retryButton').focus({preventScroll:true});
+  }
+  ui.menu.addEventListener('click',()=>{if(state.phase!=='ready')return;ui.help.hidden=false;modalMode(true);$('helpClose').focus({preventScroll:true});});
+  $('helpClose').addEventListener('click',()=>{ui.help.hidden=true;modalMode(false);ui.menu.focus({preventScroll:true});});
+  $('resetButton').addEventListener('click',()=>resetGame());$('retryButton').addEventListener('click',()=>resetGame());
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!ui.help.hidden){ui.help.hidden=true;modalMode(false);ui.menu.focus({preventScroll:true});}});
+  window.addEventListener('resize',scheduleLayout);
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',scheduleLayout);
+  if('ResizeObserver' in window)new ResizeObserver(()=>{if(ui.app.isConnected)scheduleLayout();}).observe(ui.board);
+  for(let i=0;i<SIZE;i++){const cell=document.createElement('div');cell.className='cell'+((Math.floor(i/COLS)+i%COLS)%2?' alt':'');ui.cells.appendChild(cell);}
+  resize();resetGame();
+
+  // Test-only helpers are absent from a normal URL. No server/score writes exist.
+  if(new URLSearchParams(location.search).get('test')==='1'){
+    window.__pazugoruTest=Object.freeze({
+      version:VERSION, rules:findGroups, hasEasyMove, hitWord,
+      snapshot:()=>({phase:state.phase,types:currentTypes(),ids:state.grid.map(t=>t.id),turn:state.turn,enemy:state.enemy,player:state.player,
+        drag:state.drag?{id:state.drag.tile.id,index:state.drag.index,pointer:state.drag.pointerId}:null,
+        positions:[...state.tiles.values()].map(t=>({id:t.id,index:t.index,x:t.x,y:t.y,tx:t.tx,ty:t.ty})),
+        count:ui.count.textContent,lastResult:state.lastResult,geometry:{...state.geometry},scroll:{x:scrollX,y:scrollY}}),
+      setBoard:types=>{if(!Array.isArray(types)||types.length!==SIZE||types.some(c=>!Number.isInteger(c)||c<0||c>5))throw Error('Expected 30 colors in 0..5');resetGame(types);},
+      setHP:(enemy,player,turn=0)=>{state.enemy=clamp(enemy,0,CONFIG.enemyMax);state.player=clamp(player,0,CONFIG.playerMax);state.turn=turn;updateHP();},
+      setRefills:types=>{if(types.some(c=>!Number.isInteger(c)||c<0||c>5))throw Error('Invalid colors');state.refillQueue=types.slice();},
+      setSeed:seed=>{let n=seed>>>0;rng=()=>{n=(Math.imul(n,1664525)+1013904223)>>>0;return n/4294967296;};},
+      resolve:()=>{if(state.phase!=='ready')throw Error('Busy');setPhase('settling');runTurn(state.epoch).catch(onRunError);},
+      cancel:()=>cancelDrag('test cancel'),reset:()=>resetGame()
+    });
+  }
+})();
+
+</script>
+</body>
+</html>
