@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "version": "0.40-ONE-SPRITE",
+  "name": "河川敷クラシック",
+  "stages": [
+    {
+      "id": "s1-korafu",
+      "manifest": "v39-stage01-korafu.json"
+    },
+    {
+      "id": "s2-bunker",
+      "manifest": "v39-stage02-bunker.json"
+    },
+    {
+      "id": "s3-rough",
+      "manifest": "v39-stage03-rough-rabbit.json"
+    },
+    {
+      "id": "boss-koshigaya",
+      "manifest": "v39-stage04-boss-dragon.json"
+    }
+  ]
+}
