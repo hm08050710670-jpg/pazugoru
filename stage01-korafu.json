@@ -1,0 +1,169 @@
+{
+  "schema": 1,
+  "id": "s1-korafu",
+  "name": "コラフ",
+  "stageLabel": "STAGE 1",
+  "course": "河川敷クラシック",
+  "background": "course-riverside.webp",
+  "texture": "turf.webp",
+  "stats": {
+    "enemyMax": 1200,
+    "playerMax": 3200,
+    "enemyAttack": 260,
+    "enemyEvery": 2,
+    "attackPerBall": 42,
+    "comboStep": 0.38,
+    "healPerBall": 38,
+    "healComboStep": 0.2
+  },
+  "display": {
+    "width": 230,
+    "height": 192,
+    "baseline": 300,
+    "frameWidth": 384,
+    "frameHeight": 320
+  },
+  "poses": {
+    "normal": {
+      "label": "通常待機",
+      "kind": "idle",
+      "detail": "ゆっくり呼吸しながら、次の操作を待ちます。",
+      "note": "",
+      "src": "korafu-normal.webp"
+    },
+    "happy": {
+      "label": "ご機嫌",
+      "kind": "idle",
+      "detail": "しばらく待っていると、目を閉じてご機嫌に揺れます。",
+      "note": "",
+      "src": "korafu-happy.webp"
+    },
+    "curious": {
+      "label": "キョロキョロ",
+      "kind": "idle",
+      "detail": "首をかしげながら、周りを見渡します。",
+      "note": "",
+      "src": "korafu-curious.webp"
+    },
+    "sleepy": {
+      "label": "うとうと",
+      "kind": "idle",
+      "detail": "操作がない時間が長くなると、こっくり居眠りします。",
+      "note": "",
+      "src": "korafu-sleepy.webp"
+    },
+    "alert": {
+      "label": "気づく・警戒",
+      "kind": "idle",
+      "detail": "ボールを持つと、動きに気づいて警戒します。",
+      "note": "",
+      "src": "korafu-alert.webp"
+    },
+    "hurt1": {
+      "label": "ダメージ・弱",
+      "kind": "hit",
+      "detail": "1〜2コンボ：ペチッ！ 少しひるむ表情に変わります。",
+      "note": "",
+      "src": "korafu-hurt1.webp"
+    },
+    "hurt2": {
+      "label": "ダメージ・中",
+      "kind": "hit",
+      "detail": "3〜4コンボ：バシッ！ 目をぎゅっと閉じてのけぞります。",
+      "note": "",
+      "src": "korafu-hurt2.webp"
+    },
+    "hurt3": {
+      "label": "ダメージ・強",
+      "kind": "hit",
+      "detail": "5コンボ以上：ドン！ 大きくのけぞり、7以上で衝撃を強化。",
+      "note": "",
+      "src": "korafu-hurt3.webp"
+    },
+    "attack": {
+      "label": "通常攻撃",
+      "kind": "attack",
+      "detail": "葉っぱショット。葉をプレイヤーのHPへ飛ばします。",
+      "note": "",
+      "src": "korafu-attack.webp"
+    },
+    "strong": {
+      "label": "強攻撃",
+      "kind": "attack",
+      "detail": "リーフストーム。複数の葉と緑の軌跡が広がります。",
+      "note": "",
+      "src": "korafu-strong.webp"
+    },
+    "special": {
+      "label": "必殺技",
+      "kind": "attack",
+      "detail": "グリーントルネード。葉の旋風で攻撃します。",
+      "note": "",
+      "src": "korafu-special.webp"
+    },
+    "defeated": {
+      "label": "撃破・ばたん",
+      "kind": "ko",
+      "detail": "HPが0になると目を回して倒れ、CLEAR！へ進みます。",
+      "note": "",
+      "src": "korafu-defeated.webp"
+    },
+    "smile": {
+      "label": "にっこり",
+      "kind": "emotion",
+      "detail": "待機中に見せる、やさしい笑顔です。",
+      "note": "",
+      "src": "korafu-happy.webp"
+    },
+    "angry": {
+      "label": "怒り",
+      "kind": "emotion",
+      "detail": "コンボを受けた後、むっと怒る表情です。",
+      "note": "",
+      "src": "korafu-alert.webp"
+    },
+    "cry": {
+      "label": "泣き",
+      "kind": "emotion",
+      "detail": "HPが残り少ないときの待機で、涙目になることがあります。",
+      "note": "",
+      "src": "korafu-hurt2.webp"
+    },
+    "surprised": {
+      "label": "驚き",
+      "kind": "emotion",
+      "detail": "居眠り中にパズルを動かすと、びっくりして目を開きます。",
+      "note": "",
+      "src": "korafu-curious.webp"
+    },
+    "worried": {
+      "label": "焦り",
+      "kind": "emotion",
+      "detail": "HPが少なくなると、焦った表情を見せます。",
+      "note": "",
+      "src": "korafu-hurt1.webp"
+    },
+    "stare": {
+      "label": "じーっ",
+      "kind": "emotion",
+      "detail": "プレイヤーの様子を、じーっと見つめます。",
+      "note": "",
+      "src": "korafu-alert.webp"
+    },
+    "wink": {
+      "label": "勝利の笑顔",
+      "kind": "emotion",
+      "detail": "コラフが勝ったときの表情。ご機嫌ポーズを共用しています。",
+      "note": "",
+      "src": "korafu-happy.webp"
+    },
+    "grumpy": {
+      "label": "むすっ",
+      "kind": "emotion",
+      "detail": "ボールが揃わなかったときに、むすっとした顔を見せます。",
+      "note": "",
+      "src": "korafu-alert.webp"
+    }
+  },
+  "notes": "この版はコラフ戦のみ。次の戦闘は素材完成後にcourse.jsonへ追加。"
+}

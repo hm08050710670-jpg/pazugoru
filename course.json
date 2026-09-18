@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "version": "0.30-L30",
+  "name": "河川敷クラシック",
+  "stages": [
+    {
+      "id": "s1-korafu",
+      "manifest": "stage01-korafu.json"
+    }
+  ]
+}
