@@ -9,7 +9,7 @@
  const timeout=15000;
  async function json(path){const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),timeout);
   try{const r=await fetch(url(path),{signal:ctl.signal,cache:'no-store'});if(!r.ok)throw Error(path+' ('+r.status+')');return await r.json();}finally{clearTimeout(timer);}}
- async function getCatalog(){if(!catalog){const v=await json('v39-course.json');if(v.schema!==1||!['0.40-ONE-SPRITE','0.41-AUTO-CHAIN'].includes(v.version)||!Array.isArray(v.stages)||!v.stages.length)throw Error('Invalid course manifest');catalog=v;}return catalog;}
+ async function getCatalog(){if(!catalog){const v=await json('c2-course.json');if(v.schema!==1||v.version!=='0.51-COURSE2-TRANSPARENT'||!Array.isArray(v.stages)||!v.stages.length)throw Error('Invalid course manifest');catalog=v;}return catalog;}
  function image(path){const key=url(path);if(images.has(key))return images.get(key).promise;
   const im=new Image(),entry={im,promise:null};
   entry.promise=new Promise((resolve,reject)=>{const timer=setTimeout(()=>failed(Error('Image timeout: '+path)),timeout);
@@ -19,8 +19,8 @@
   });images.set(key,entry);return entry.promise;
  }
  function validate(s){
-  if(!['0.39-BODY39','0.40-ONE-SPRITE','0.41-AUTO-CHAIN'].includes(s.build||'0.39-BODY39'))throw Error('対応していないステージ素材です。');
-  const allowed=/^(v40-(korafu|bunker|rough|boss)\.png|v39-(korafu|bunker|rough|boss)-(idle|step|ready|hit|down)\.webp)$/;
+  if(s.build!=='0.51-COURSE2-TRANSPARENT')throw Error('対応していないステージ素材です。');
+  const allowed=/^c2-(sunamogu|bankani|oobankani|abiko)\.png$/;
   for(const p of Object.values(s.poses||{}))if(!allowed.test(p.src))throw Error('未確認の画像を拒否しました: '+p.src);
   if(s.schema!==1||!s.id||!s.name||!s.poses||!s.stats)throw Error('Invalid stage');
   for(const k of required)if(!s.poses[k]?.src)throw Error('Missing pose '+k);

@@ -689,7 +689,7 @@ async function enemyShot(epoch){
       await shoot(combo,attackColors,epoch);state.enemy=Math.max(0,state.enemy-damage);updateHP();
       if(activeStage?.element==='fire'&&activeStage?.bossPhases&&state.enemy>0){
         const ph=bossPhase();
-        if(ph.rage&&!state.bossRageShown){state.bossRageShown=true;state.bossPhase2Shown=true;BattleSound.enemy();battleWord('怒りモード!!',9);setStatus('越谷ベビードラゴンが怒った！ 毎ターン攻撃・回復量50%');ui.hero.classList.add('boss-rage');await wait(motion(520),epoch);}
+        if(ph.rage&&!state.bossRageShown){state.bossRageShown=true;state.bossPhase2Shown=true;BattleSound.enemy();battleWord('怒りモード!!',9);setStatus('我孫子サンドドラゴンが怒った！ 毎ターン攻撃・回復量50%');ui.hero.classList.add('boss-rage');await wait(motion(520),epoch);}
         else if(ph.phase2&&!state.bossPhase2Shown){state.bossPhase2Shown=true;battleWord('猛攻モード!',6);setStatus('ボスが本気になった！ ここから毎ターン攻撃');await wait(motion(430),epoch);}
       }
       const where=centerOf(ui.enemyHud);where.y-=22;floating(damage.toLocaleString('ja-JP'),where,'float-text damage',800);
@@ -714,7 +714,7 @@ async function enemyShot(epoch){
       ui.result.hidden=true;modalMode(false);
       try{
         await Assets.prefetchNext();
-        if(nextId==='boss-koshigaya')await bossIntro();
+        if(nextId==='c2-abiko')await bossIntro();
         await loadBattle(nextId);
       }catch(e){
         ui.result.hidden=false;modalMode(true);setStatus('次のステージを読み込めませんでした');
@@ -724,7 +724,7 @@ async function enemyShot(epoch){
     if(!win)setPose('wink');
     ui.result.classList.toggle('win',win);ui.result.hidden=false;modalMode(true);
     $('resultTitle').textContent=win?'BOSS CLEAR!':'GAME OVER';
-    $('resultMessage').textContent=win?'越谷ベビードラゴンを撃破！':(activeStage.name+'に負けた！ピンクの回復も狙って、もう一度。');
+    $('resultMessage').textContent=win?'我孫子サンドドラゴンを撃破！':(activeStage.name+'に負けた！ピンクの回復も狙って、もう一度。');
     const nsb=$('nextStageButton');if(nsb)nsb.hidden=true;
     $('resultTurns').textContent=`${state.turn} ターン`;$('resultCombo').textContent=`最高 ${state.maxCombo} COMBO`;
     $('retryButton').focus({preventScroll:true});

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "version": "0.51-COURSE2-TRANSPARENT",
+  "name": "COURSE 2 BUNKER",
+  "stages": [
+    {
+      "id": "c2-sunamogu",
+      "manifest": "c2-stage01-sunamogu.json"
+    },
+    {
+      "id": "c2-bankani",
+      "manifest": "c2-stage02-bankani.json"
+    },
+    {
+      "id": "c2-oobankani",
+      "manifest": "c2-stage03-oobankani.json"
+    },
+    {
+      "id": "c2-abiko",
+      "manifest": "c2-stage04-abiko-dragon.json"
+    }
+  ]
+}
