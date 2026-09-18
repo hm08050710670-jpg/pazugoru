@@ -300,8 +300,8 @@
       ]
     }
   },
-  "build": "0.39-BODY39",
-  "artRevision": "body39",
+  "build": "0.41-AUTO-CHAIN",
+  "artRevision": "one40",
   "notes": [
     "派手な炎球・砂弾を含む旧画像は読み込まない。",
     "弱・中・強の被弾は同じ完全な被弾画像と移動量で表現。",
