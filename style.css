@@ -242,3 +242,18 @@ button{font:inherit;cursor:pointer;color:inherit;touch-action:manipulation}butto
 .hero.charged{box-shadow:inset 0 -80px 80px -65px #aff078c0}
 .music-volume{margin-top:7px}.sheet .music-panel #audioRetry{margin-top:8px}
 @media(prefers-reduced-motion:reduce){.golf-spin,.playerhud.player-hit,.playerhud.player-hit .bar{animation:none!important}.tile .orb{transition:none!important}.ball-trail{display:none}}
+
+.sand-shot{position:absolute;width:18px;height:18px;border-radius:50%;z-index:23;pointer-events:none;background:radial-gradient(circle at 35% 30%,#fff2bf 0 16%,#d9a95f 30%,#8b5a2b 72%,#4c2e19 100%);box-shadow:0 0 9px #e6b96c88}
+.result-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.result-actions button{min-height:46px}
+
+.rough-shot{position:absolute;width:28px;height:9px;border-radius:70% 10% 70% 10%;z-index:23;pointer-events:none;background:linear-gradient(90deg,#194d21,#68c83e,#d8f56a);box-shadow:0 0 9px #73e64f88}
+.fire-shot{position:absolute;width:22px;height:30px;border-radius:50% 50% 55% 55%;z-index:23;pointer-events:none;background:radial-gradient(circle at 50% 72%,#fff8a0 0 12%,#ffcc33 22%,#ff6a00 55%,#d82000 78%,transparent 80%);filter:drop-shadow(0 0 7px #ff6a00)}
+
+.hero.boss-rage{animation:bossRagePulse 1.05s ease-in-out infinite alternate}
+.hero.boss-rage .dragon-img{filter:drop-shadow(0 0 12px #ff6a00) drop-shadow(0 0 22px #d82000) saturate(1.18)!important}
+@keyframes bossRagePulse{from{box-shadow:inset 0 0 0 rgba(255,70,0,0)}to{box-shadow:inset 0 0 38px rgba(255,55,0,.22)}}
+@media (prefers-reduced-motion:reduce){.hero.boss-rage{animation:none}}
+
+/* v0.34 unified character safe area */
+.dragon-visual,.dragon-img{overflow:visible!important}
+.dragon-img{object-fit:contain!important;object-position:center bottom!important;max-width:100%!important;max-height:100%!important}

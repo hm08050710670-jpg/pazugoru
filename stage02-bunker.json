@@ -1,0 +1,169 @@
+{
+  "schema": 1,
+  "id": "s2-bunker",
+  "name": "バンカービートル",
+  "stageLabel": "STAGE 2",
+  "course": "河川敷クラシック",
+  "background": "course-riverside.webp",
+  "texture": "turf.webp",
+  "stats": {
+    "enemyMax": 1600,
+    "playerMax": 3200,
+    "enemyAttack": 340,
+    "enemyEvery": 2,
+    "attackPerBall": 42,
+    "comboStep": 0.38,
+    "healPerBall": 38,
+    "healComboStep": 0.2
+  },
+  "display": {
+    "width": 260,
+    "height": 205,
+    "baseline": 300,
+    "frameWidth": 420,
+    "frameHeight": 320
+  },
+  "element": "sand",
+  "poses": {
+    "normal": {
+      "label": "通常待機",
+      "kind": "idle",
+      "detail": "バンカービートルの通常待機モーション。",
+      "note": "",
+      "src": "bunker-normal.webp"
+    },
+    "happy": {
+      "label": "ご機嫌",
+      "kind": "idle",
+      "detail": "バンカービートルのご機嫌モーション。",
+      "note": "",
+      "src": "bunker-happy.webp"
+    },
+    "curious": {
+      "label": "キョロキョロ",
+      "kind": "idle",
+      "detail": "バンカービートルのキョロキョロモーション。",
+      "note": "",
+      "src": "bunker-curious.webp"
+    },
+    "sleepy": {
+      "label": "うとうと",
+      "kind": "idle",
+      "detail": "バンカービートルのうとうとモーション。",
+      "note": "",
+      "src": "bunker-sleepy.webp"
+    },
+    "alert": {
+      "label": "気づく・警戒",
+      "kind": "idle",
+      "detail": "バンカービートルの気づく・警戒モーション。",
+      "note": "",
+      "src": "bunker-alert.webp"
+    },
+    "hurt1": {
+      "label": "ダメージ・弱",
+      "kind": "hit",
+      "detail": "バンカービートルのダメージ・弱モーション。",
+      "note": "",
+      "src": "bunker-hurt1.webp"
+    },
+    "hurt2": {
+      "label": "ダメージ・中",
+      "kind": "hit",
+      "detail": "バンカービートルのダメージ・中モーション。",
+      "note": "",
+      "src": "bunker-hurt2.webp"
+    },
+    "hurt3": {
+      "label": "ダメージ・強",
+      "kind": "hit",
+      "detail": "バンカービートルのダメージ・強モーション。",
+      "note": "",
+      "src": "bunker-hurt3.webp"
+    },
+    "attack": {
+      "label": "通常攻撃",
+      "kind": "attack",
+      "detail": "バンカービートルの通常攻撃モーション。",
+      "note": "",
+      "src": "bunker-attack.webp"
+    },
+    "strong": {
+      "label": "強攻撃",
+      "kind": "attack",
+      "detail": "バンカービートルの強攻撃モーション。",
+      "note": "",
+      "src": "bunker-strong.webp"
+    },
+    "special": {
+      "label": "必殺技",
+      "kind": "attack",
+      "detail": "バンカービートルの必殺技モーション。",
+      "note": "",
+      "src": "bunker-special.webp"
+    },
+    "defeated": {
+      "label": "撃破・ばたん",
+      "kind": "ko",
+      "detail": "バンカービートルの撃破・ばたんモーション。",
+      "note": "",
+      "src": "bunker-defeated.webp"
+    },
+    "smile": {
+      "label": "smile",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "bunker-happy.webp"
+    },
+    "angry": {
+      "label": "angry",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "bunker-alert.webp"
+    },
+    "cry": {
+      "label": "cry",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "bunker-hurt2.webp"
+    },
+    "surprised": {
+      "label": "surprised",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "bunker-curious.webp"
+    },
+    "worried": {
+      "label": "worried",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "bunker-hurt1.webp"
+    },
+    "stare": {
+      "label": "stare",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "bunker-alert.webp"
+    },
+    "wink": {
+      "label": "wink",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "bunker-happy.webp"
+    },
+    "grumpy": {
+      "label": "grumpy",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "bunker-alert.webp"
+    }
+  }
+}

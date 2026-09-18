@@ -17,10 +17,10 @@
     "healComboStep": 0.2
   },
   "display": {
-    "width": 230,
-    "height": 192,
+    "width": 225,
+    "height": 190,
     "baseline": 300,
-    "frameWidth": 384,
+    "frameWidth": 420,
     "frameHeight": 320
   },
   "poses": {
@@ -165,5 +165,6 @@
       "src": "korafu-alert.webp"
     }
   },
-  "notes": "この版はコラフ戦のみ。次の戦闘は素材完成後にcourse.jsonへ追加。"
+  "notes": "この版はコラフ戦のみ。次の戦闘は素材完成後にcourse.jsonへ追加。",
+  "element": "grass"
 }

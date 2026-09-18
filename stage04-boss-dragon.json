@@ -1,0 +1,187 @@
+{
+  "schema": 1,
+  "id": "boss-koshigaya",
+  "name": "越谷ベビードラゴン",
+  "stageLabel": "BOSS",
+  "course": "河川敷クラシック",
+  "background": "course-riverside.webp",
+  "texture": "turf.webp",
+  "stats": {
+    "enemyMax": 6500,
+    "playerMax": 3200,
+    "enemyAttack": 550,
+    "enemyEvery": 2,
+    "attackPerBall": 42,
+    "comboStep": 0.38,
+    "healPerBall": 38,
+    "healComboStep": 0.2
+  },
+  "display": {
+    "width": 340,
+    "height": 270,
+    "baseline": 300,
+    "frameWidth": 420,
+    "frameHeight": 320
+  },
+  "element": "fire",
+  "poses": {
+    "normal": {
+      "label": "通常待機",
+      "kind": "idle",
+      "detail": "越谷ベビードラゴンの通常待機モーション。",
+      "note": "",
+      "src": "boss-normal.webp"
+    },
+    "happy": {
+      "label": "ご機嫌",
+      "kind": "idle",
+      "detail": "越谷ベビードラゴンのご機嫌モーション。",
+      "note": "",
+      "src": "boss-happy.webp"
+    },
+    "curious": {
+      "label": "キョロキョロ",
+      "kind": "idle",
+      "detail": "越谷ベビードラゴンのキョロキョロモーション。",
+      "note": "",
+      "src": "boss-curious.webp"
+    },
+    "sleepy": {
+      "label": "うとうと",
+      "kind": "idle",
+      "detail": "越谷ベビードラゴンのうとうとモーション。",
+      "note": "",
+      "src": "boss-sleepy.webp"
+    },
+    "alert": {
+      "label": "警戒",
+      "kind": "idle",
+      "detail": "越谷ベビードラゴンの警戒モーション。",
+      "note": "",
+      "src": "boss-alert.webp"
+    },
+    "hurt1": {
+      "label": "ダメージ弱",
+      "kind": "hit",
+      "detail": "越谷ベビードラゴンのダメージ弱モーション。",
+      "note": "",
+      "src": "boss-hurt1.webp"
+    },
+    "hurt2": {
+      "label": "ダメージ中",
+      "kind": "hit",
+      "detail": "越谷ベビードラゴンのダメージ中モーション。",
+      "note": "",
+      "src": "boss-hurt2.webp"
+    },
+    "hurt3": {
+      "label": "ダメージ強",
+      "kind": "hit",
+      "detail": "越谷ベビードラゴンのダメージ強モーション。",
+      "note": "",
+      "src": "boss-hurt3.webp"
+    },
+    "attack": {
+      "label": "通常攻撃",
+      "kind": "attack",
+      "detail": "越谷ベビードラゴンの通常攻撃モーション。",
+      "note": "",
+      "src": "boss-attack.webp"
+    },
+    "strong": {
+      "label": "強攻撃",
+      "kind": "attack",
+      "detail": "越谷ベビードラゴンの強攻撃モーション。",
+      "note": "",
+      "src": "boss-strong.webp"
+    },
+    "special": {
+      "label": "必殺技",
+      "kind": "attack",
+      "detail": "越谷ベビードラゴンの必殺技モーション。",
+      "note": "",
+      "src": "boss-special.webp"
+    },
+    "defeated": {
+      "label": "撃破",
+      "kind": "ko",
+      "detail": "越谷ベビードラゴンの撃破モーション。",
+      "note": "",
+      "src": "boss-defeated.webp"
+    },
+    "smile": {
+      "label": "smile",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "boss-happy.webp"
+    },
+    "angry": {
+      "label": "angry",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "boss-alert.webp"
+    },
+    "cry": {
+      "label": "cry",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "boss-hurt2.webp"
+    },
+    "surprised": {
+      "label": "surprised",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "boss-curious.webp"
+    },
+    "worried": {
+      "label": "worried",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "boss-hurt1.webp"
+    },
+    "stare": {
+      "label": "stare",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "boss-alert.webp"
+    },
+    "wink": {
+      "label": "wink",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "boss-happy.webp"
+    },
+    "grumpy": {
+      "label": "grumpy",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "boss-alert.webp"
+    }
+  },
+  "bossPhases": {
+    "phase2": {
+      "hpRatio": 0.5,
+      "enemyEvery": 1,
+      "label": "猛攻モード"
+    },
+    "rage": {
+      "hpRatio": 0.25,
+      "enemyEvery": 1,
+      "label": "怒りモード",
+      "healMultiplier": 0.5
+    }
+  },
+  "notes": [
+    "HP50%以下で毎ターン攻撃",
+    "HP25%以下で怒りモード",
+    "怒りモード中はピンク回復量50%"
+  ]
+}

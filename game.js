@@ -68,7 +68,7 @@ function matchBurst(point,size,combo){const count=Math.min(16,6+Math.max(0,size-
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const state = { phase:'loading', grid:[], tiles:new Map(), nextId:1, drag:null,
     turn:0, enemy:CONFIG.enemyMax, player:CONFIG.playerMax, maxCombo:0,
-    epoch:0, geometry:null, keyboardIndex:0, lastResult:null, refillQueue:[] };
+    epoch:0, geometry:null, keyboardIndex:0, lastResult:null, refillQueue:[], bossPhase2Shown:false, bossRageShown:false };
   let frameId=0, lastFrame=0, layoutFrame=0, wordAnimation=null, dragonAnimation=null;
   let rng=Math.random;
   let faceTimer=0;
@@ -208,17 +208,25 @@ function matchBurst(point,size,combo){const count=Math.min(16,6+Math.max(0,size-
     ui.enemyBar.setAttribute('aria-valuemax',String(CONFIG.enemyMax));ui.playerBar.setAttribute('aria-valuemax',String(CONFIG.playerMax));
     ui.enemyBar.setAttribute('aria-valuenow',String(state.enemy));ui.playerBar.setAttribute('aria-valuenow',String(state.player));
     ui.playerHud.classList.toggle('low',pr<=.25);
-    const left=CONFIG.enemyEvery-state.turn%CONFIG.enemyEvery;
+    const every=currentEnemyEvery(),left=every-state.turn%every;
     ui.count.textContent=`あと${left}ターン`;ui.attackCount.classList.toggle('soon',left===1);
   }
+  function bossPhase(){
+    if(activeStage?.element!=='fire'||!activeStage?.bossPhases)return {rage:false,phase2:false,every:CONFIG.enemyEvery,healMultiplier:1};
+    const ratio=state.enemy/CONFIG.enemyMax,bp=activeStage.bossPhases;
+    const rage=ratio<=bp.rage.hpRatio,phase2=ratio<=bp.phase2.hpRatio;
+    return {rage,phase2,every:(rage?bp.rage.enemyEvery:phase2?bp.phase2.enemyEvery:CONFIG.enemyEvery),healMultiplier:rage?(bp.rage.healMultiplier||1):1};
+  }
+  function currentEnemyEvery(){return bossPhase().every;}
   function resetGame(types){
+    ui.hero.classList.remove('boss-rage');state.bossPhase2Shown=false;state.bossRageShown=false;
     state.epoch++;Audio.stopEffects();resetDirector();
     clearTimeout(faceTimer);ui.dragon.classList.remove('hurt1','hurt2','hurt3','ko');
     if(state.drag)cancelDrag('');
     if(wordAnimation)wordAnimation.cancel();if(dragonAnimation)dragonAnimation.cancel();
     ui.effects.replaceChildren();ui.word.style.opacity='0';ui.result.hidden=true;ui.help.hidden=true;modalMode(false);
     ui.shell.classList.remove('resolving');ui.pieces.replaceChildren();state.tiles.clear();
-    state.turn=0;state.enemy=CONFIG.enemyMax;state.player=CONFIG.playerMax;state.maxCombo=0;state.lastResult=null;state.refillQueue=[];
+    state.turn=0;state.enemy=CONFIG.enemyMax;state.player=CONFIG.playerMax;state.bossPhase2Shown=false;state.bossRageShown=false;state.maxCombo=0;state.lastResult=null;state.refillQueue=[];
     setPhase('ready');measure();
     state.grid=(types||freshTypes()).map((color,index)=>createTile(color,index));
     state.keyboardIndex=0;ui.slot.style.display='none';updateHP();setStatus('ボールを押したまま動かそう');requestDraw();
@@ -492,13 +500,49 @@ function matchBurst(point,size,combo){const count=Math.min(16,6+Math.max(0,size-
     await Promise.all(tasks);if(epoch!==state.epoch)throw new StaleRun();
     grassScatter(target,kind==='special'?14:8);
   }
-  async function enemyShot(epoch){
+  
+  function bunkerSandAttack(){
+    const origin=centerOf(ui.anchor),target=centerOf(ui.playerBar);
+    for(let i=0;i<9;i++){
+      const e=document.createElement('i');e.className='sand-shot';ui.effects.appendChild(e);
+      const ox=origin.x-15+(i%3)*12,oy=origin.y+(i%3)*5,tx=target.x-50+i*12,ty=target.y+(i%2)*8;
+      const a=animateElement(e,[{transform:`translate(${ox}px,${oy}px) scale(.35)`,opacity:0},
+      {opacity:1,offset:.12},{transform:`translate(${(ox+tx)/2}px,${oy-42}px) scale(1.15)`,opacity:.9,offset:.55},
+      {transform:`translate(${tx}px,${ty}px) scale(.65)`,opacity:0}],{duration:motion(390+i*17),easing:'cubic-bezier(.2,.72,.32,1)',fill:'both'});
+      if(a)a.finished.then(()=>e.remove()).catch(()=>e.remove());else setTimeout(()=>e.remove(),540);
+    }
+  }
+
+  function roughRushAttack(){
+    const origin=centerOf(ui.anchor),target=centerOf(ui.playerBar);
+    for(let i=0;i<8;i++){const e=document.createElement('i');e.className='rough-shot';ui.effects.appendChild(e);
+      const ox=origin.x-35+i*8,oy=origin.y+(i%3)*5,tx=target.x-48+i*14,ty=target.y+(i%2)*7;
+      const a=animateElement(e,[{transform:`translate(${ox}px,${oy}px) rotate(${i*16}deg) scale(.4)`,opacity:0},{opacity:1,offset:.12},
+      {transform:`translate(${tx}px,${ty}px) rotate(${250+i*37}deg) scale(1.1)`,opacity:.9}],{duration:motion(300+i*13),easing:'cubic-bezier(.15,.8,.25,1)',fill:'both'});
+      if(a)a.finished.then(()=>e.remove()).catch(()=>e.remove());else setTimeout(()=>e.remove(),480);}
+  }
+  function fireBreathAttack(){
+    const origin=centerOf(ui.anchor),target=centerOf(ui.playerBar);
+    for(let i=0;i<10;i++){const e=document.createElement('i');e.className='fire-shot';ui.effects.appendChild(e);
+      const ox=origin.x-12+(i%3)*8,oy=origin.y-15+(i%4)*6,tx=target.x-55+i*12,ty=target.y+(i%2)*8;
+      const a=animateElement(e,[{transform:`translate(${ox}px,${oy}px) scale(.3)`,opacity:0},{opacity:1,offset:.1},
+      {transform:`translate(${(ox+tx)/2}px,${oy-25}px) scale(1.25)`,opacity:1,offset:.55},{transform:`translate(${tx}px,${ty}px) scale(.65)`,opacity:.3}],{duration:motion(350+i*16),easing:'cubic-bezier(.2,.7,.25,1)',fill:'both'});
+      if(a)a.finished.then(()=>e.remove()).catch(()=>e.remove());else setTimeout(()=>e.remove(),520);}
+  }
+async function enemyShot(epoch){
     clearTimeout(faceTimer);clearTimeout(expressionTimer);ui.dragon.classList.remove('hurt1','hurt2','hurt3');
-    const kind=attackKind();setPose(kind);ui.count.textContent='攻撃！';
-    const text=kind==='special'?'グリーントルネード！':kind==='strong'?'リーフストーム！':'葉っぱショット！';
-    setStatus(activeStage.name+'の草攻撃');battleWord(text,kind==='special'?8:kind==='strong'?5:2);
+    const ratio=state.enemy/CONFIG.enemyMax,kind=ratio<=.25?'special':ratio<=.55?'strong':'attack';setPose(kind);ui.count.textContent='攻撃！';
+    const element=activeStage?.element||'grass';
+    const words={
+      sand:[kind==='special'?'サンドストーム！':kind==='strong'?'バンカーラッシュ！':'砂弾！','砂'],
+      rough:[kind==='special'?'ラフサイクロン！':kind==='strong'?'ラフラッシュ！':'突進！','ラフ'],
+      fire:[kind==='special'?'ファイアバースト！':kind==='strong'?'フレイムブレス！':'火炎！','炎'],
+      grass:[kind==='special'?'グリーントルネード！':kind==='strong'?'リーフストーム！':'葉っぱショット！','草']
+    }[element]||['攻撃！','属性'];
+    setStatus(`${activeStage.name}の${words[1]}攻撃`);battleWord(words[0],kind==='special'?8:kind==='strong'?5:2);
     if(dragonAnimation)dragonAnimation.cancel();dragonAnimation=animateElement(ui.dragon,[{transform:'translateX(0) scale(1)'},{transform:'translateX(-5px) scale(.96)',offset:.3},{transform:'translateX(8px) scale(1.04)',offset:.62},{transform:'translateX(0) scale(1)'}],{duration:motion(330),easing:'ease-out'});
-    await wait(motion(140),epoch);await korafuLeafAttack(kind,epoch);impact(centerOf(ui.playerBar),kind==='special'?7:kind==='strong'?5:2);return kind;
+    if(element==='sand')bunkerSandAttack();else if(element==='rough')roughRushAttack();else if(element==='fire')fireBreathAttack();else korafuLeafAttack();
+    await wait(motion(430),epoch);impact(centerOf(ui.playerBar),kind==='special'?7:kind==='strong'?5:2);return kind;
   }
   function playerDamageFX(){ui.playerHud.classList.remove('player-hit');void ui.playerHud.offsetWidth;ui.playerHud.classList.add('player-hit');setTimeout(()=>ui.playerHud.classList.remove('player-hit'),560);const f=document.createElement('div');f.className='hit-screen';ui.effects.appendChild(f);const a=animateElement(f,[{opacity:0},{opacity:.95,offset:.18},{opacity:0}],{duration:motion(430),easing:'ease-out',fill:'both'});if(a)a.finished.then(()=>f.remove()).catch(()=>f.remove());else setTimeout(()=>f.remove(),450)}
   async function defeatedSequence(epoch,combo){
@@ -613,36 +657,46 @@ function matchBurst(point,size,combo){const count=Math.min(16,6+Math.max(0,size-
     }
     ui.shell.classList.remove('resolving');state.maxCombo=Math.max(state.maxCombo,combo);
     const damage=Math.round(attackBalls*CONFIG.attackPerBall*(1+(combo-1)*CONFIG.comboStep));
-    const nominalHeal=Math.round(healBalls*CONFIG.healPerBall*(1+(combo-1)*CONFIG.healComboStep));
+    const phaseBefore=bossPhase();
+    const nominalHeal=Math.round(healBalls*CONFIG.healPerBall*(1+(combo-1)*CONFIG.healComboStep)*phaseBefore.healMultiplier);
     const actualHeal=Math.min(CONFIG.playerMax-state.player,nominalHeal);
     if(healBalls){await healSuction(actualHeal,healBalls,epoch,healSources);state.player+=actualHeal;updateHP();}
     setPhase('attack');
     if(attackBalls){
       await shoot(combo,attackColors,epoch);state.enemy=Math.max(0,state.enemy-damage);updateHP();
+      if(activeStage?.element==='fire'&&activeStage?.bossPhases&&state.enemy>0){
+        const ph=bossPhase();
+        if(ph.rage&&!state.bossRageShown){state.bossRageShown=true;state.bossPhase2Shown=true;BattleSound.enemy();battleWord('怒りモード!!',9);setStatus('越谷ベビードラゴンが怒った！ 毎ターン攻撃・回復量50%');ui.hero.classList.add('boss-rage');await wait(motion(520),epoch);}
+        else if(ph.phase2&&!state.bossPhase2Shown){state.bossPhase2Shown=true;battleWord('猛攻モード!',6);setStatus('ボスが本気になった！ ここから毎ターン攻撃');await wait(motion(430),epoch);}
+      }
       const where=centerOf(ui.enemyHud);where.y-=22;floating(damage.toLocaleString('ja-JP'),where,'float-text damage',800);
       await wait(motion(390),epoch);
     }else{battleWord('回復！',combo);await wait(motion(420),epoch);}
     state.turn++;state.lastResult={combo,damage,heal:actualHeal,healBalls,attackBalls,waves};
     updateHP();
     if(state.enemy<=0){await defeatedSequence(epoch,combo);return;}
-    if(state.turn%CONFIG.enemyEvery===0){
+    const enemyEvery=currentEnemyEvery();
+    if(state.turn%enemyEvery===0){
       setPhase('enemy');BattleSound.enemy();await enemyShot(epoch);BattleSound.playerHit();playerDamageFX();state.player=Math.max(0,state.player-CONFIG.enemyAttack);updateHP();
       floating(`−${CONFIG.enemyAttack}`,centerOf(ui.playerHud),'float-text damage',700);
       if(state.player<=0){await wait(motion(430),epoch);finish(false);return;}
-      setStatus(`${combo} COMBO · ${damage}ダメージ${actualHeal?' / ＋'+actualHeal+'回復':''} · 草ダメージ −260`);
+      setStatus(`${combo} COMBO · ${damage}ダメージ${actualHeal?' / ＋'+actualHeal+'回復':''} · ${({sand:'砂',rough:'ラフ',fire:'炎',grass:'草'}[activeStage?.element]||'属性')}ダメージ −${CONFIG.enemyAttack}`);
     }else setStatus(`${combo} COMBO · ${damage}ダメージ${actualHeal?' / ＋'+actualHeal+'回復':''}`);
-    setPhase('ready');if(combo>=3&&state.turn%CONFIG.enemyEvery!==0)briefly('angry',650);
+    setPhase('ready');if(combo>=3&&state.turn%currentEnemyEvery()!==0)briefly('angry',650);
   }
   function finish(win){
     setPhase('ended');clearTimeout(faceTimer);clearTimeout(expressionTimer);if(!win)setPose('wink');ui.result.classList.toggle('win',win);ui.result.hidden=false;modalMode(true);
-    $('resultTitle').textContent=win?'STAGE 1 CLEAR!':'GAME OVER';
-    $('resultMessage').textContent=win?'STAGE 1 コラフをクリア！':'コラフに負けた！ピンクの回復も狙って、もう一度。';
+    const nextId=Assets.nextId();
+    $('resultTitle').textContent=win?(activeStage.stageLabel+' CLEAR!'):'GAME OVER';
+    $('resultMessage').textContent=win?(activeStage.name+'をクリア！'):(activeStage.name+'に負けた！ピンクの回復も狙って、もう一度。');
+    $('nextStageButton').hidden=!(win&&nextId);
     $('resultTurns').textContent=`${state.turn} ターン`;$('resultCombo').textContent=`最高 ${state.maxCombo} COMBO`;
-    $('retryButton').focus({preventScroll:true});
+    (win&&nextId?$('nextStageButton'):$('retryButton')).focus({preventScroll:true});
   }
   ui.menu.addEventListener('click',()=>{if(state.phase!=='ready')return;ui.help.hidden=false;modalMode(true);$('helpClose').focus({preventScroll:true});});
   $('helpClose').addEventListener('click',()=>{ui.help.hidden=true;modalMode(false);idleStamp=performance.now();ui.menu.focus({preventScroll:true});});
   $('resetButton').addEventListener('click',()=>resetGame());$('retryButton').addEventListener('click',()=>resetGame());
+  $('nextStageButton').addEventListener('click',async()=>{const id=Assets.nextId();if(!id)return;ui.result.hidden=true;modalMode(false);setStatus('次のステージを準備中…');try{await Assets.prefetchNext();await loadBattle(id);}catch(e){ui.result.hidden=false;modalMode(true);setStatus('次のステージを読み込めませんでした');}});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!ui.help.hidden){ui.help.hidden=true;modalMode(false);idleStamp=performance.now();ui.menu.focus({preventScroll:true});}});
   window.addEventListener('resize',scheduleLayout);
   if(window.visualViewport)window.visualViewport.addEventListener('resize',scheduleLayout);

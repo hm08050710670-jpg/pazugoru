@@ -1,0 +1,169 @@
+{
+  "schema": 1,
+  "id": "s3-rough",
+  "name": "ラフラビット",
+  "stageLabel": "STAGE 3",
+  "course": "河川敷クラシック",
+  "background": "course-riverside.webp",
+  "texture": "turf.webp",
+  "stats": {
+    "enemyMax": 2200,
+    "playerMax": 3200,
+    "enemyAttack": 430,
+    "enemyEvery": 2,
+    "attackPerBall": 42,
+    "comboStep": 0.38,
+    "healPerBall": 38,
+    "healComboStep": 0.2
+  },
+  "display": {
+    "width": 285,
+    "height": 220,
+    "baseline": 300,
+    "frameWidth": 420,
+    "frameHeight": 320
+  },
+  "element": "rough",
+  "poses": {
+    "normal": {
+      "label": "通常待機",
+      "kind": "idle",
+      "detail": "ラフラビットの通常待機モーション。",
+      "note": "",
+      "src": "rough-normal.webp"
+    },
+    "happy": {
+      "label": "ご機嫌",
+      "kind": "idle",
+      "detail": "ラフラビットのご機嫌モーション。",
+      "note": "",
+      "src": "rough-happy.webp"
+    },
+    "curious": {
+      "label": "キョロキョロ",
+      "kind": "idle",
+      "detail": "ラフラビットのキョロキョロモーション。",
+      "note": "",
+      "src": "rough-curious.webp"
+    },
+    "sleepy": {
+      "label": "うとうと",
+      "kind": "idle",
+      "detail": "ラフラビットのうとうとモーション。",
+      "note": "",
+      "src": "rough-sleepy.webp"
+    },
+    "alert": {
+      "label": "警戒",
+      "kind": "idle",
+      "detail": "ラフラビットの警戒モーション。",
+      "note": "",
+      "src": "rough-alert.webp"
+    },
+    "hurt1": {
+      "label": "ダメージ弱",
+      "kind": "hit",
+      "detail": "ラフラビットのダメージ弱モーション。",
+      "note": "",
+      "src": "rough-hurt1.webp"
+    },
+    "hurt2": {
+      "label": "ダメージ中",
+      "kind": "hit",
+      "detail": "ラフラビットのダメージ中モーション。",
+      "note": "",
+      "src": "rough-hurt2.webp"
+    },
+    "hurt3": {
+      "label": "ダメージ強",
+      "kind": "hit",
+      "detail": "ラフラビットのダメージ強モーション。",
+      "note": "",
+      "src": "rough-hurt3.webp"
+    },
+    "attack": {
+      "label": "通常攻撃",
+      "kind": "attack",
+      "detail": "ラフラビットの通常攻撃モーション。",
+      "note": "",
+      "src": "rough-attack.webp"
+    },
+    "strong": {
+      "label": "強攻撃",
+      "kind": "attack",
+      "detail": "ラフラビットの強攻撃モーション。",
+      "note": "",
+      "src": "rough-strong.webp"
+    },
+    "special": {
+      "label": "必殺技",
+      "kind": "attack",
+      "detail": "ラフラビットの必殺技モーション。",
+      "note": "",
+      "src": "rough-special.webp"
+    },
+    "defeated": {
+      "label": "撃破",
+      "kind": "ko",
+      "detail": "ラフラビットの撃破モーション。",
+      "note": "",
+      "src": "rough-defeated.webp"
+    },
+    "smile": {
+      "label": "smile",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "rough-happy.webp"
+    },
+    "angry": {
+      "label": "angry",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "rough-alert.webp"
+    },
+    "cry": {
+      "label": "cry",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "rough-hurt2.webp"
+    },
+    "surprised": {
+      "label": "surprised",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "rough-curious.webp"
+    },
+    "worried": {
+      "label": "worried",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "rough-hurt1.webp"
+    },
+    "stare": {
+      "label": "stare",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "rough-alert.webp"
+    },
+    "wink": {
+      "label": "wink",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "rough-happy.webp"
+    },
+    "grumpy": {
+      "label": "grumpy",
+      "kind": "emotion",
+      "detail": "表情リアクション。",
+      "note": "",
+      "src": "rough-alert.webp"
+    }
+  }
+}
